@@ -26,7 +26,7 @@ def get_current_user(credentials=Depends(security)):
         user_id = payload.get("user_id")
 
     except Exception:
-
+        
         raise HTTPException(
             status_code=401,
             detail="Invalid token"
