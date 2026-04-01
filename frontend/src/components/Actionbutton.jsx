@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-export default function ActionDropdown() {
+export default function ActionDropdown({ id }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-   const path = location.pathname.startsWith("/users")
-    ? "/edit-user/1"
-    :   "/edit-roles/1";
+  const path = location.pathname.startsWith("/users")
+    ? `/edit-user/${id}`
+    : `/edit-roles/${id}`;
 
   return (
     <div className="relative inline-block">
