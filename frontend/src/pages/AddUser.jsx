@@ -1,8 +1,74 @@
-import React from "react";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 export default function AddUserForm() {
+  const { token } = useSelector((state) => state.auth);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    joiningDate: "",
+    department: "",
+    designation: "",
+    parent: "",
+    role: "",
+    gender: "",
+    address: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlesubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/users`,
+        form, // no need to stringify
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        },
+      );
+
+      toast.success("User added successfully!");
+
+      // optional: reset form
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        joiningDate: "",
+        department: "",
+        designation: "",
+        parent: "",
+        role: "",
+        gender: "",
+        address: "",
+      });
+    } catch (error) {
+      console.error("Error adding user:", error);
+      toast.error("Failed to add user. Please try again.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-start py-10">
+    <form
+      onSubmit={handlesubmit}
+      className="min-h-screen bg-gray-100 flex justify-center items-start py-10"
+    >
       <div className="w-full max-w-5xl bg-white p-8 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-6">Add User</h2>
 
@@ -14,8 +80,11 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">Name</label>
               <input
                 type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
                 placeholder="Enter Name"
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+                className="w-full border rounded px-3 py-2"
               />
             </div>
 
@@ -24,8 +93,11 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
-                defaultValue="admin@gmail.com"
-                className="w-full border rounded px-3 py-2 bg-gray-100"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Enter Email"
+                className="w-full border rounded px-3 py-2"
               />
             </div>
 
@@ -34,6 +106,9 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">Phone</label>
               <input
                 type="text"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
                 placeholder="Enter Phone"
                 className="w-full border rounded px-3 py-2"
               />
@@ -44,7 +119,13 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">
                 Joining Date
               </label>
-              <input type="date" className="w-full border rounded px-3 py-2" />
+              <input
+                type="date"
+                name="joiningDate"
+                value={form.joiningDate}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              />
             </div>
 
             {/* Department */}
@@ -52,14 +133,17 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">
                 Department
               </label>
-              <select className="w-full border rounded px-3 py-2">
-                <option>-select here-</option>
+              <select
+                name="department"
+                value={form.department}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">-select here-</option>
+                <option value="HR">HR</option>
+                <option value="IT">IT</option>
               </select>
             </div>
-
-            {/* DOB */}
-
-            {/* Marital Status */}
           </div>
 
           {/* RIGHT COLUMN */}
@@ -69,16 +153,30 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">
                 Designation
               </label>
-              <select className="w-full border rounded px-3 py-2">
-                <option>-select here-</option>
+              <select
+                name="designation"
+                value={form.designation}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">-select here-</option>
+                <option value="Manager">Manager</option>
+                <option value="Developer">Developer</option>
               </select>
             </div>
 
             {/* Gender */}
             <div>
               <label className="block text-sm font-medium mb-1">Gender</label>
-              <select className="w-full border rounded px-3 py-2">
-                <option>-select here-</option>
+              <select
+                name="gender"
+                value={form.gender}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">-select here-</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
               </select>
             </div>
 
@@ -87,6 +185,9 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">Address</label>
               <input
                 type="text"
+                name="address"
+                value={form.address}
+                onChange={handleChange}
                 placeholder="Enter Address"
                 className="w-full border rounded px-3 py-2"
               />
@@ -95,33 +196,43 @@ export default function AddUserForm() {
             {/* Role */}
             <div>
               <label className="block text-sm font-medium mb-1">Role</label>
-              <select className="w-full border rounded px-3 py-2">
-                <option>-select here-</option>
+              <select
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">-select here-</option>
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
               </select>
             </div>
-
-            {/* Color Indication */}
-
-            {/* Status Condition */}
 
             {/* Parent */}
             <div>
               <label className="block text-sm font-medium mb-1">Parent</label>
-              <select className="w-full border rounded px-3 py-2">
-                <option>Admin</option>
+              <select
+                name="parent"
+                value={form.parent}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">-select here-</option>
+                <option value="Admin">Admin</option>
               </select>
             </div>
-
-            {/* Checkbox */}
           </div>
         </div>
 
         <div className="pt-4">
-          <button className="mt-4 w-full bg-blue-600 text-white py-1.5 text-sm rounded">
+          <button
+            type="submit"
+            className="mt-4 w-full bg-blue-600 text-white py-1.5 text-sm rounded"
+          >
             Add User
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

@@ -1,6 +1,63 @@
-import React from "react";
+import React, { use } from "react";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 function editRoles() {
+  const Navigate = useNavigate();
+  const { id } = useParams();
+  const { token } = useSelector((state) => state.auth);
+
+  const [form, setForm] = useState({
+    name: "",
+    status: "",
+  });
+
+  const fetchRoleData = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/roles/${id}`,
+      );
+      setForm({
+        name: data.name,
+        status: data.status,
+      });
+    } catch (error) {
+      console.error("Error fetching role data:", error);
+    }
+  };
+
+  const handlesubmit = async (e) => {
+    // e.preventDefault();
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/roles/${id}`,
+        JSON.stringify(form),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+
+          withCredentials: true,
+        },
+      );
+      toast.success("Role updated successfully!");
+      Navigate("/roles");
+    } catch (error) {
+      console.error("Error updating role:", error);
+      toast.error("Failed to update role. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    // fetchRoleData();
+  }, [id]);
+
   const modules = [
     {
       name: "User",
@@ -93,8 +150,17 @@ function editRoles() {
                   </label>
                 ))}
               </div>
+              <div className="mt-6"></div>
             </div>
           ))}
+        </div>
+        <div className="flex justify-start items-center">
+          <button
+            className="bg-blue-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-blue-700 m-4 "
+            onClick={handlesubmit}
+          >
+            edit role
+          </button>
         </div>
       </div>
     </div>

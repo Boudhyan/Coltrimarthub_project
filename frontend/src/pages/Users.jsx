@@ -121,14 +121,14 @@ function Users() {
                     <td className="border px-4 py-2">{user?.role_name}</td>
                     <td className="border px-4 py-2">{user?.colour}</td>
                     <td className="border px-4 py-2">
-                      {user?.isactive ? "Active" : "inactive"}
+                      {user.isactive ? "Active" : "inactive"}
                     </td>
 
                     <td
                       className="border px-4 py-2 flex justify-end gap
                 "
                     >
-                      <ActionDropdown />
+                      <ActionDropdown id={user.id} />
                     </td>
                   </tr>
                 ))}
