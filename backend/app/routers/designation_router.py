@@ -1,10 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.database.session import SessionLocal
+from app.utils.db import get_db
 from app.models.designation import Designation
 from app.schemas.designation_schema import DesignationCreate, DesignationResponse
-from fastapi import Depends
 from app.utils.permissions import require_permission
 
 router = APIRouter(
@@ -12,23 +11,39 @@ router = APIRouter(
     tags=["Designations"]
 )
 
+
+@router.get("/", response_model=list[DesignationResponse])
+def get_designations(
+    db: Session = Depends(get_db),
+    permission=Depends(require_permission("designation_read"))
+):
+    return db.query(Designation).all()
+
+
+@router.get("/{designation_id}", response_model=DesignationResponse)
+def get_designation(
+    designation_id: int,
+    db: Session = Depends(get_db),
+    permission=Depends(require_permission("designation_read"))
+):
+    designation = db.query(Designation).filter(Designation.id == designation_id).first()
+
+    if not designation:
+        raise HTTPException(status_code=404, detail="Designation not found")
+
+    return designation
+
+
 @router.post("/", response_model=DesignationResponse)
 def create_designation(
     data: DesignationCreate,
+    db: Session = Depends(get_db),
     permission=Depends(require_permission("designation_create"))
 ):
-
-    db: Session = SessionLocal()
-
-    existing = db.query(Designation).filter(
-        Designation.name == data.name
-    ).first()
+    existing = db.query(Designation).filter(Designation.name == data.name).first()
 
     if existing:
-        raise HTTPException(
-            status_code=400,
-            detail="Designation already exists"
-        )
+        raise HTTPException(status_code=400, detail="Designation already exists")
 
     designation = Designation(name=data.name)
 
@@ -38,57 +53,35 @@ def create_designation(
 
     return designation
 
-@router.get("/", response_model=list[DesignationResponse])
-def get_designations(
-    permission=Depends(require_permission("designation_read"))
-):
-
-    db: Session = SessionLocal()
-
-    return db.query(Designation).all()
 
 @router.put("/{designation_id}")
 def update_designation(
     designation_id: int,
     data: DesignationCreate,
+    db: Session = Depends(get_db),
     permission=Depends(require_permission("designation_update"))
 ):
-
-    db: Session = SessionLocal()
-
-    designation = db.query(Designation).filter(
-        Designation.id == designation_id
-    ).first()
+    designation = db.query(Designation).filter(Designation.id == designation_id).first()
 
     if not designation:
-        raise HTTPException(
-            status_code=404,
-            detail="Designation not found"
-        )
+        raise HTTPException(status_code=404, detail="Designation not found")
 
     designation.name = data.name
-
     db.commit()
 
     return {"message": "Designation updated"}
 
+
 @router.delete("/{designation_id}")
 def delete_designation(
     designation_id: int,
+    db: Session = Depends(get_db),
     permission=Depends(require_permission("designation_delete"))
 ):
-
-    db: Session = SessionLocal()
-
-    designation = db.query(Designation).filter(
-        Designation.id == designation_id
-    ).first()
+    designation = db.query(Designation).filter(Designation.id == designation_id).first()
 
     if not designation:
-        raise HTTPException(
-            status_code=404,
-            detail="Designation not found"
-        )
+        raise HTTPException(status_code=404, detail="Designation not found")
 
     db.delete(designation)
     db.commit()

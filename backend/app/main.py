@@ -20,6 +20,10 @@ import app.models.designation
 from app.routers import designation_router
 import app.models.company
 from app.routers import company_router
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi import Request
+from app.utils.dependencies import get_current_user
 
 
 
@@ -28,6 +32,27 @@ app = FastAPI(
     title="Lab Testing Backend",
     version="1.0"
 )
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+
+    errors = {}
+
+    for err in exc.errors():
+        field = err["loc"][-1]
+        message = err["msg"]
+
+        if message.startswith("Value error, "):
+            message = message.replace("Value error, ", "")
+
+        errors[field] = message
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "message": "Validation failed",
+            "errors": errors
+        }
+    )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173","http://127.0.0.1:5173" ],  # frontend origin
@@ -57,13 +82,10 @@ app.include_router(department_router.router)
 app.include_router(designation_router.router)
 app.include_router(company_router.router)
 
-@app.get("/protected")
-def protected_route(user=Depends(get_current_user)):
 
-    return {
-        "message": "You are logged in",
-        "username": user.username
-    }
+@app.get("/protected")
+def protected_route(current_user=Depends(get_current_user)):
+    return {"message": "You are logged in", "user": current_user.username}
 @app.get("/test-rbac")
 def test_rbac(
     permission=Depends(require_permission("user_read"))

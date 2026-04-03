@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer
-from jose import jwt
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
-from app.database.session import SessionLocal
+from app.utils.db import get_db
 from app.models.user import User
 from app.utils.security import SECRET_KEY, ALGORITHM
 
@@ -11,12 +11,13 @@ from app.utils.security import SECRET_KEY, ALGORITHM
 security = HTTPBearer()
 
 
-def get_current_user(credentials=Depends(security)):
-
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
     token = credentials.credentials
 
     try:
-
         payload = jwt.decode(
             token,
             SECRET_KEY,
@@ -25,25 +26,32 @@ def get_current_user(credentials=Depends(security)):
 
         user_id = payload.get("user_id")
 
-    except Exception:
+        if user_id is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token"
+            )
 
+    except JWTError:
         raise HTTPException(
             status_code=401,
             detail="Invalid token"
         )
-
-    db: Session = SessionLocal()
-
 
     user = db.query(User).filter(
         User.id == user_id
     ).first()
 
     if not user:
-
         raise HTTPException(
             status_code=401,
             detail="User not found"
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=403,
+            detail="User is disabled"
         )
 
     return user
