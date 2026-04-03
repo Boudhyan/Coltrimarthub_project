@@ -2,19 +2,22 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function AddUserForm() {
   const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    name: "",
+    username: "",
+    password: "1234",
     email: "",
     phone: "",
     joiningDate: "",
-    department: "",
+    department_name: "",
     designation: "",
     parent: "",
-    role: "",
+    role_name: "",
     gender: "",
     address: "",
   });
@@ -33,7 +36,7 @@ export default function AddUserForm() {
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL}/users`,
-        form, // no need to stringify
+        JSON.stringify(form), // no need to stringify
         {
           headers: {
             "Content-Type": "application/json",
@@ -43,21 +46,23 @@ export default function AddUserForm() {
         },
       );
 
-      toast.success("User added successfully!");
-
       // optional: reset form
       setForm({
-        name: "",
+        password: "",
+        username: "",
         email: "",
         phone: "",
         joiningDate: "",
-        department: "",
+        department_name: "",
         designation: "",
         parent: "",
-        role: "",
+        role_name: "",
         gender: "",
         address: "",
       });
+
+      toast.success("User added successfully!");
+      navigate("/users");
     } catch (error) {
       console.error("Error adding user:", error);
       toast.error("Failed to add user. Please try again.");
@@ -80,8 +85,8 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">Name</label>
               <input
                 type="text"
-                name="name"
-                value={form.name}
+                name="username"
+                value={form.username}
                 onChange={handleChange}
                 placeholder="Enter Name"
                 className="w-full border rounded px-3 py-2"
@@ -135,7 +140,7 @@ export default function AddUserForm() {
               </label>
               <select
                 name="department"
-                value={form.department}
+                value={form.department_name}
                 onChange={handleChange}
                 className="w-full border rounded px-3 py-2"
               >
@@ -198,7 +203,7 @@ export default function AddUserForm() {
               <label className="block text-sm font-medium mb-1">Role</label>
               <select
                 name="role"
-                value={form.role}
+                value={form.role_name}
                 onChange={handleChange}
                 className="w-full border rounded px-3 py-2"
               >

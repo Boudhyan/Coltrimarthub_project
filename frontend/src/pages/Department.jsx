@@ -4,10 +4,85 @@ import { useState } from "react";
 import { Pencil, Trash } from "lucide-react";
 import Popup from "../components/Popup";
 import LogoutButton from "../components/logoutbutton";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 function Department() {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("Department");
+  const [title, setTitle] = useState("Add Department");
+  const { token } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(false);
+  const [departmentname, setDepartmentname] = useState("");
+
+  const [selectedDepartment, setselectedDepartment] = useState("");
+  const [departments, setdepartments] = useState([]);
+
+  const handleEdit = (id, departmentname) => {
+    console.log(departmentname);
+    setselectedDepartment(id);
+    setTitle("Edit Department");
+    setOpen(true);
+    setDepartmentname(departmentname); // Set the department name for editing
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      setselectedDepartment(id);
+      setLoading(true);
+      console.log(`Delete department with ID: ${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/departments/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+
+      setselectedDepartment(""); // Clear selected department after deletion
+      setdepartments((prevDepartments) =>
+        prevDepartments.filter((department) => department.id !== id),
+      );
+      setOpen(false);
+      toast.success("Department deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting department:", error);
+      toast.error("Failed to delete department. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDepartments = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/departments`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        },
+      );
+      setdepartments(data);
+      console.log("Fetched departments:", data);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+
+  const handleadd = () => {
+    setTitle("Add Department");
+    setOpen(true);
+    setDepartmentname(""); // Clear department name for adding new department
+  };
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       {/* TOP BAR */}
@@ -30,7 +105,7 @@ function Department() {
         <div className="flex justify-between m-b-4 items-center ">
           <h2 className="text-lg font-semibold mb-4"> Department</h2>
           <button
-            onClick={() => setOpen(true)}
+            onClick={() => handleadd()}
             className="text-white cursor-pointer bg-green-700 w-40 h-10 border border-amber-50 rounded-xl mb-3 "
           >
             Add Department
@@ -78,43 +153,35 @@ function Department() {
             </thead>
 
             <tbody>
-              <tr>
-                <td className="border px-4 py-2">Digital Marketing</td>
-                <td className="border px-4 py-2 text-left">
-                  <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
-                    Active
-                  </button>
-                </td>
-                <td className="border px-4 py-2 flex justify-end ">
-                  <button
-                    onClick={() => setOpen(true)}
-                    className="text-white bg-green-700 w-10 h-10 border border-amber-50 rounded-xl mb-3 flex justify-center items-center "
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button className="text-white bg-red-600 w-10 h-10 border border-amber-50 rounded-xl mb-3  flex justify-center items-center">
-                    <Trash size={16} />
-                  </button>
-                </td>
-              </tr>
-
-              <tr>
-                <td className="border px-4 py-2">Sales_Manager</td>
-                <td className="border px-4 py-2 text-left">
-                  <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
-                    Active
-                  </button>
-                </td>
-
-                <td className="border px-4 py-2 flex justify-end ">
-                  <button className="text-white bg-green-700 w-10 h-10 border border-amber-50 rounded-xl mb-3 flex justify-center items-center ">
-                    <Pencil size={16} />
-                  </button>
-                  <button className="text-white bg-red-600 w-10 h-10 border border-amber-50 rounded-xl mb-3  flex justify-center items-center">
-                    <Trash size={16} />
-                  </button>
-                </td>
-              </tr>
+              {departments.map((department, index) => (
+                <tr key={index}>
+                  <td className="border px-4 py-2">{department.name}</td>
+                  <td className="border px-4 py-2 text-left">
+                    <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
+                      Active
+                    </button>
+                  </td>
+                  <td className="border px-4 py-2 flex justify-end ">
+                    <button
+                      onClick={() => handleEdit(department.id, department.name)}
+                      className="text-white bg-green-700 w-10 h-10 border border-amber-50 cursor-pointer rounded-xl mb-3  flex justify-center items-center "
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="text-white bg-red-600 w-10 h-10 border border-amber-50 cursor-pointer rounded-xl mb-3  flex justify-center items-center"
+                      onClick={() => handleDelete(department.id)}
+                      disabled={loading}
+                    >
+                      {loading && selectedDepartment == department.id ? (
+                        <Loader size={16} color="#fff" />
+                      ) : (
+                        <Trash size={16} />
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
@@ -138,8 +205,17 @@ function Department() {
           </div>
         </div>
       </div>
-
-      <Popup open={open} setOpen={setOpen} title={title} />
+      {open && (
+        <Popup
+          open={open}
+          setOpen={setOpen}
+          title={title}
+          departments={departments}
+          setdepartments={setdepartments}
+          departmentId={selectedDepartment}
+          departmentName={departmentname}
+        />
+      )}
 
       {/* FOOTER */}
       <div className="bg-white text-sm text-gray-600 px-6 py-3 border-t">
