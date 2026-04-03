@@ -10,6 +10,9 @@ import { useState } from "react";
 function Users() {
   const { token } = useSelector((state) => state.auth);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [open, setOpen] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -31,7 +34,7 @@ function Users() {
     if (token) {
       fetchUsers();
     }
-  }, [token]);
+  }, [token, users.length]);
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -109,36 +112,37 @@ function Users() {
             </thead>
 
             <tbody>
-              <tr>
-                <td className="border px-4 py-2">Kewal Krishan</td>
-                <td className="border px-4 py-2">1234</td>
-                <td className="border px-4 py-2">09910035373</td>
-                <td className="border px-4 py-2">kewalkwason@gmail.com</td>
-                <td className="border px-4 py-2">IT</td>
-                <td className="border px-4 py-2">Sales</td>
-                <td className="border px-4 py-2">Admin</td>
-                <td className="border px-4 py-2">Blue</td>
-                <td className="border px-4 py-2">Active</td>
+              {users.length > 0 &&
+                users.map((user) => (
+                  <tr key={user.id}>
+                    <td className="border px-4 py-2">{user?.username}</td>
+                    <td className="border px-4 py-2">{user?.id}</td>
+                    <td className="border px-4 py-2">{user?.phone}</td>
+                    <td className="border px-4 py-2">{user?.email}</td>
+                    <td className="border px-4 py-2">{user?.designation}</td>
+                    <td className="border px-4 py-2">{user?.department}</td>
+                    <td className="border px-4 py-2">{user?.role_name}</td>
+                    <td className="border px-4 py-2">{user?.colour}</td>
+                    <td className="border px-4 py-2">
+                      {user.isactive ? "Active" : "inactive"}
+                    </td>
 
-                <td className="border px-4 py-2 flex justify-end gap-2">
-                  <ActionDropdown />
-                </td>
-              </tr>
-
-              <tr>
-                <td className="border px-4 py-2">Kewal Krishan</td>
-                <td className="border px-4 py-2">1234</td>
-                <td className="border px-4 py-2">09910035373</td>
-                <td className="border px-4 py-2">kewalkwason@gmail.com</td>
-                <td className="border px-4 py-2">IT</td>
-                <td className="border px-4 py-2">Sales</td>
-                <td className="border px-4 py-2">Admin</td>
-                <td className="border px-4 py-2">Blue</td>
-                <td className="border px-4 py-2">Active</td>
-                <td className="border px-4 py-2 flex justify-end gap-2">
-                  <ActionDropdown />
-                </td>
-              </tr>
+                    <td
+                      className="border px-4 py-2 flex justify-end gap
+                "
+                    >
+                      <ActionDropdown
+                        id={user.id}
+                        selectedUser={selectedUser}
+                        setSelectedUser={setSelectedUser}
+                        users={users}
+                        setUsers={setUsers}
+                        open={open}
+                        setOpen={setOpen}
+                      />
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
 

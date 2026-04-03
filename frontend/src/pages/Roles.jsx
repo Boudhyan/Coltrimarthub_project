@@ -3,8 +3,45 @@ import { Plus } from "lucide-react";
 import ActionDropdown from "../components/Actionbutton";
 import { Link } from "react-router-dom";
 import LogoutButton from "../components/logoutbutton";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 function Roles() {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [roles, setRoles] = useState([]);
+  const { token } = useSelector((state) => state.auth);
+
+  const fetchRoles = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/roles`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        },
+      );
+      console.log("Fetched roles:", data);
+      setRoles(data);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchRoles();
+    }
+  }, [token, roles.length]);
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       {/* TOP BAR */}
@@ -73,31 +110,28 @@ function Roles() {
             </thead>
 
             <tbody>
-              <tr>
-                <td className="border px-4 py-2">Kewal Krishan</td>
-                <td className="border px-4 py-2 text-left">
-                  <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
-                    Active
-                  </button>
-                </td>
+              {roles.map((role) => (
+                <tr key={role.id}>
+                  <td className="border px-4 py-2">{role.name}</td>
+                  <td className="border px-4 py-2 text-left ">
+                    <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
+                      Active
+                    </button>
+                  </td>
 
-                <td className="border px-4 py-2 flex justify-end gap-2">
-                  <ActionDropdown />
-                </td>
-              </tr>
-
-              <tr>
-                <td className="border px-4 py-2">Ritesh</td>
-                <td className="border px-4 py-2 text-left">
-                  <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
-                    Active
-                  </button>
-                </td>
-
-                <td className="border px-4 py-2 flex justify-end gap-2">
-                  <ActionDropdown />
-                </td>
-              </tr>
+                  <td className="px-4 py-2 flex justify-end items-center pt-4 gap-2 border">
+                    <ActionDropdown
+                      open={open}
+                      setOpen={setOpen}
+                      selectedUser={selectedUser}
+                      setSelectedUser={setSelectedUser}
+                      id={role.id}
+                      setRoles={setRoles}
+                      roles={roles}
+                    />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 

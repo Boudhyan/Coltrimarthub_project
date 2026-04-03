@@ -1,21 +1,66 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Navigate, useParams } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Edituser() {
+  const { token } = useSelector((state) => state.auth);
   const [form, setForm] = useState({
-    name: "Admin",
-    role: "admin",
-    email: "admin@gmail.com",
-    phone: "9874563210",
-    color: "#DC3545",
-    statusCondition: "No",
-    joiningDate: "2022-09-05",
-    parent: "Admin",
-    department: "Sales_Manager",
-    designation: "IT",
-    gender: "Male",
+    username: "",
+    role_name: "",
+    email: "",
+    phone: "",
+    color: "",
+    statusCondition: "",
+    joiningDate: "",
+    parent: "",
+    department: "",
+    designation: "",
+    gender: "",
     allLead: true,
     newLead: true,
   });
+
+  const Navigate = useNavigate();
+
+  const { id } = useParams();
+
+  const fetchUserData = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/users/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        },
+      );
+      console.log("Fetched user data:", data);
+      setForm({
+        username: data.name,
+        role_name: data.role,
+        email: data.email,
+        phone: data.phone,
+        color: data.color,
+        statusCondition: data.statusCondition,
+        joiningDate: data.joiningDate,
+        parent: data.parent,
+        department: data.department,
+        designation: data.designation,
+      });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,10 +70,32 @@ function Edituser() {
     });
   };
 
+  const handlesubmit = async (e) => {
+    // e.preventDefault();
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/users/${id}`,
+        JSON.stringify(form),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        },
+      );
+      toast.success("User updated successfully!");
+      Navigate("/users");
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error("Failed to update user. Please try again.");
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Page Title */}
-      <h1 className="text-2xl font-semibold mb-4">Add Leads</h1>
+      <h1 className="text-2xl font-semibold mb-4">Edit User</h1>
 
       {/* Note bar */}
       <div className="bg-gray-600 text-white px-4 py-2 rounded-t">
@@ -41,8 +108,8 @@ function Edituser() {
           <div>
             <label className="block text-sm font-medium mb-1">Name</label>
             <input
-              name="name"
-              value={form.name}
+              name="username"
+              value={form.username || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             />
@@ -53,7 +120,7 @@ function Edituser() {
             <label className="block text-sm font-medium mb-1">Role</label>
             <select
               name="role"
-              value={form.role}
+              value={form.role_name || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             >
@@ -67,7 +134,7 @@ function Edituser() {
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               name="email"
-              value={form.email}
+              value={form.email || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             />
@@ -81,13 +148,13 @@ function Edituser() {
             <div className="flex">
               <input
                 name="color"
-                value={form.color}
+                value={form.color || ""}
                 onChange={handleChange}
                 className="w-full border rounded-l p-2"
               />
               <input
                 type="color"
-                value={form.color}
+                value={form.color || ""}
                 onChange={(e) => setForm({ ...form, color: e.target.value })}
                 className="w-12 border rounded-r"
               />
@@ -99,7 +166,7 @@ function Edituser() {
             <label className="block text-sm font-medium mb-1">Phone</label>
             <input
               name="phone"
-              value={form.phone}
+              value={form.phone || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             />
@@ -112,7 +179,7 @@ function Edituser() {
             </label>
             <select
               name="statusCondition"
-              value={form.statusCondition}
+              value={form.statusCondition || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             >
@@ -129,7 +196,7 @@ function Edituser() {
             <input
               type="date"
               name="joiningDate"
-              value={form.joiningDate}
+              value={form.joiningDate || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             />
@@ -140,7 +207,7 @@ function Edituser() {
             <label className="block text-sm font-medium mb-1">Parent</label>
             <select
               name="parent"
-              value={form.parent}
+              value={form.parent || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             >
@@ -154,7 +221,7 @@ function Edituser() {
             <label className="block text-sm font-medium mb-1">Department</label>
             <select
               name="department"
-              value={form.department}
+              value={form.department || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             >
@@ -169,7 +236,7 @@ function Edituser() {
               <input
                 type="checkbox"
                 name="allLead"
-                checked={form.allLead}
+                checked={form.allLead || ""}
                 onChange={handleChange}
               />
               All Lead
@@ -179,7 +246,7 @@ function Edituser() {
               <input
                 type="checkbox"
                 name="newLead"
-                checked={form.newLead}
+                checked={form.newLead || ""}
                 onChange={handleChange}
               />
               New Lead
@@ -193,7 +260,7 @@ function Edituser() {
             </label>
             <select
               name="designation"
-              value={form.designation}
+              value={form.designation || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             >
@@ -207,7 +274,7 @@ function Edituser() {
             <label className="block text-sm font-medium mb-1">Gender</label>
             <select
               name="gender"
-              value={form.gender}
+              value={form.gender || ""}
               onChange={handleChange}
               className="w-full border rounded p-2"
             >
@@ -219,8 +286,11 @@ function Edituser() {
 
         {/* Button */}
         <div className="mt-6">
-          <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-            Add User
+          <button
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            onClick={handlesubmit}
+          >
+            Edit User
           </button>
         </div>
       </div>

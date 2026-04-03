@@ -1,12 +1,88 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pencil, Trash } from "lucide-react";
 import Popup from "../components/Popup";
 import LogoutButton from "../components/logoutbutton";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 function Designation() {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("Designation");
+  const [title, setTitle] = useState("Add Designation");
+  const { token } = useSelector((state) => state.auth);
+
+  const [loading, setLoading] = useState(false);
+  const [designationName, setDesignationName] = useState("");
+  const [selectedDesignation, setSelectedDesignation] = useState("");
+  const [designations, setDesignations] = useState([]);
+
+  // ✅ EDIT
+  const handleEdit = (id, name) => {
+    setSelectedDesignation(id);
+    setTitle("Edit Designation");
+    setDesignationName(name);
+    setOpen(true);
+  };
+
+  // ✅ DELETE
+  const handleDelete = async (id) => {
+    try {
+      setSelectedDesignation(id);
+      setLoading(true);
+
+      await axios.delete(`${import.meta.env.VITE_API_URL}/designations/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+
+      setDesignations((prev) => prev.filter((item) => item.id !== id));
+
+      toast.success("Designation deleted successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete designation");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ FETCH
+  const fetchDesignations = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/designations`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        },
+      );
+      console.log("fetched designations: ", data);
+
+      setDesignations(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // ✅ ADD
+  const handleAdd = () => {
+    setTitle("Add Designation");
+    setDesignationName("");
+    setSelectedDesignation("");
+    setOpen(true);
+  };
+
+  useEffect(() => {
+    fetchDesignations();
+  }, []);
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       {/* TOP BAR */}
@@ -24,50 +100,21 @@ function Designation() {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="p-6 flex-1 ">
-        {/* TITLE */}
-        <div className="flex justify-between m-b-4 items-center ">
+      {/* MAIN */}
+      <div className="p-6 flex-1">
+        <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold mb-4">Designation</h2>
-          <button
-          onClick={() => setOpen(true)}
-          className="text-white cursor-pointer bg-green-700 w-40 h-10 border border-amber-50 rounded-xl mb-3 ">
 
+          <button
+            onClick={handleAdd}
+            className="text-white bg-green-700 w-40 h-10 rounded-xl mb-3"
+          >
             Add Designation
           </button>
         </div>
 
-        {/* CARD */}
+        {/* TABLE CARD */}
         <div className="bg-white shadow rounded p-4">
-          {/* BUTTONS + SEARCH */}
-          <div className="flex justify-between mb-4">
-            <div className="flex gap-2 flex-wrap">
-              {[
-                "Copy",
-                "CSV",
-                "Excel",
-                "PDF",
-                "Print",
-                "Column visibility",
-              ].map((btn) => (
-                <button
-                  key={btn}
-                  className="bg-gray-700 text-white text-sm px-3 py-1 rounded"
-                >
-                  {btn}
-                </button>
-              ))}
-            </div>
-
-            <div>
-              <input
-                placeholder="Search"
-                className="border rounded px-3 py-1"
-              />
-            </div>
-          </div>
-
-          {/* TABLE */}
           <table className="w-full border text-sm">
             <thead className="bg-gray-100">
               <tr>
@@ -78,76 +125,62 @@ function Designation() {
             </thead>
 
             <tbody>
-              <tr>
-                <td className="border px-4 py-2">IT </td>
-                <td className="border px-4 py-2 text-left">
-                  <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
-                    Active
-                  </button>
-                </td>
+              {designations.map((item) => (
+                <tr key={item.id}>
+                  <td className="border px-4 py-2">{item.name}</td>
 
-                <td className="border px-4 py-2 flex justify-end ">
-                  <button
-                    onClick={() => setOpen(true)}
-                    className="text-white bg-green-700 w-10 h-10 border border-amber-50 rounded-xl mb-3 flex justify-center items-center "
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button className="text-white bg-red-600 w-10 h-10 border border-amber-50 rounded-xl mb-3  flex justify-center items-center">
-                    <Trash size={16} />
-                  </button>
-                </td>
-              </tr>
+                  <td className="border px-4 py-2">
+                    <button className="text-white bg-green-700 w-20 h-10 rounded-xl">
+                      Active
+                    </button>
+                  </td>
 
-              <tr>
-                <td className="border px-4 py-2">Sales_Manager</td>
-                <td className="border px-4 py-2 text-left">
-                  <button className="text-white bg-green-700 w-20 h-10 border border-amber-50 rounded-xl mb-3 ">
-                    Active
-                  </button>
-                </td>
-                <td className="border px-4 py-2 flex justify-end ">
-                  <button className="text-white bg-green-700 w-10 h-10 border border-amber-50 rounded-xl mb-3 flex justify-center items-center ">
-                    <Pencil size={16} />
-                  </button>
-                  <button className="text-white bg-red-600 w-10 h-10 border border-amber-50 rounded-xl mb-3  flex justify-center items-center">
-                    <Trash size={16} />
-                  </button>
-                </td>
-              </tr>
+                  <td className="border px-4 py-2 flex justify-end gap-2">
+                    <button
+                      onClick={() => handleEdit(item.id, item.name)}
+                      className="bg-green-700 w-10 h-10 rounded-xl flex items-center justify-center text-white"
+                    >
+                      <Pencil size={16} />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="bg-red-600 w-10 h-10 rounded-xl flex items-center justify-center text-white"
+                      disabled={loading}
+                    >
+                      {loading && selectedDesignation === item.id ? (
+                        <Loader size={16} color="#fff" />
+                      ) : (
+                        <Trash size={16} />
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
-
-          {/* TABLE FOOTER */}
-          <div className="flex justify-between items-center mt-4 text-sm">
-            <span>Showing 1 to 2 of 2 entries</span>
-
-            <div className="flex gap-2">
-              <button className="border px-3 py-1 rounded bg-gray-100">
-                Previous
-              </button>
-
-              <button className="bg-blue-600 text-white px-3 py-1 rounded">
-                1
-              </button>
-
-              <button className="border px-3 py-1 rounded bg-gray-100">
-                Next
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
-      <Popup open={open} setOpen={setOpen} title={title} />
+      {/* ✅ POPUP */}
+      {open && (
+        <Popup
+          open={open}
+          setOpen={setOpen}
+          title={title}
+          designations={designations}
+          setDesignations={setDesignations}
+          designationId={selectedDesignation}
+          designationName={designationName}
+        />
+      )}
 
       {/* FOOTER */}
       <div className="bg-white text-sm text-gray-600 px-6 py-3 border-t">
         Copyright © 2022-2023{" "}
         <span className="text-blue-600 font-semibold">
-          Marthub IT | Dashboard :: LEADS Management
+          Marthub IT | Dashboard
         </span>
-        . All rights reserved.
       </div>
     </div>
   );
