@@ -1,0 +1,21 @@
+/** Backend permission codes (must match `permissions.code`). */
+export const P = {
+  USER_READ: "user_read",
+  USER_CREATE: "user_create",
+  USER_UPDATE: "user_update",
+  ROLE_READ: "role_read",
+  ROLE_CREATE: "role_create",
+  ROLE_UPDATE: "role_update",
+  DEPARTMENT_READ: "department_read",
+  DESIGNATION_READ: "designation_read",
+  CUSTOMER_READ: "company_read",
+  CUSTOMER_CREATE: "company_create",
+  CUSTOMER_UPDATE: "company_update",
+  CUSTOMER_DELETE: "company_delete",
+  SERVICE_TYPE_READ: "service_type_read",
+  SERVICE_REQUEST_READ: "service_request_read",
+  SERVICE_REQUEST_CREATE: "service_request_create",
+  SERVICE_REQUEST_UPDATE: "service_request_update",
+  OBSERVATION_READ: "observation_read",
+  OBSERVATION_UPDATE: "observation_update",
+};

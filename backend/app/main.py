@@ -1,5 +1,7 @@
-from fastapi import FastAPI,Depends
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+
 from app.database.session import engine
 from app.database.base import Base
 
@@ -19,7 +21,14 @@ from app.routers import department_router
 import app.models.designation
 from app.routers import designation_router
 import app.models.company
+import app.models.service_request
+import app.models.service_type
+import app.models.observation_request
+import app.models.password_reset_token
 from app.routers import company_router
+from app.routers import observation_router
+from app.routers import service_request_router
+from app.routers import service_type_router
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi import Request
@@ -55,11 +64,33 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173","http://127.0.0.1:5173" ],  # frontend origin
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+    ],
+    # Any dev port on localhost / 127.0.0.1 (Vite may pick another port).
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],  # allow GET, POST, PUT, DELETE
     allow_headers=["*"],  # allow all headers
 )
+
+
+class ReloadDotenvMiddleware(BaseHTTPMiddleware):
+    """Re-read .env on every request so edits apply without restarting uvicorn."""
+
+    async def dispatch(self, request, call_next):
+        from app.env_loader import load_backend_dotenv
+
+        load_backend_dotenv(quiet=True)
+        return await call_next(request)
+
+
+app.add_middleware(ReloadDotenvMiddleware)
 
 Base.metadata.create_all(bind=engine)
 
@@ -81,6 +112,9 @@ app.include_router(role_router.router)
 app.include_router(department_router.router)
 app.include_router(designation_router.router)
 app.include_router(company_router.router)
+app.include_router(observation_router.router)
+app.include_router(service_request_router.router)
+app.include_router(service_type_router.router)
 
 
 @app.get("/protected")

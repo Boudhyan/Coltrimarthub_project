@@ -1,0 +1,541 @@
+===== service 10322/Creepage And Clearances,.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause No. | Test / Requirement name | Test result/ observation
+8 (11) | CREEPAGE DISTANCES AND CLEARANCES
+8 (11.2) | Working voltage (V)…………………: | 
+ | Voltage form…………………….…: | 
+ | PTI…………………………………….: | 
+ | Impulse withstand category (Normal category II) (Category III Annex U) | 
+ | (1) Current-carrying parts of different polarity: cr (mm); cl (mm)………….: | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 10322/Endurance Test and thermal Test.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause No. | Test / Requirement name | Test result/ observation
+13 (12) | ENDURANCE TEST AND THERMAL TEST
+ | Endurance test: | 
+ | mountingposition: | 
+ | test temperature (C): | 
+ | total duration (h): | 
+ | supply voltage: Un factor; calculated voltage (V): | 
+13 (12.4) | Thermal test (normal operation) | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 10322/Humidity Test & Insulation Resistance.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause No. | Test / Requirement name | Test result/ observation
+14 (9) | RESISTANCE TO DUST AND MOISTURE
+14 (9.3) | Humidity test 48 h | 
+[/TABLE]
+[TABLE]
+15 (10) | INSULATION RESISTANCE AND ELECTRIC STRENGTH
+15 (10.2.1) | Insulation resistance test | 
+ | Insulation resistance (M): | 
+ | SELV | 
+ | between current-carrying parts of different polarity: | 
+ | between current-carrying parts and mounting surface: | 
+ | between current-carrying parts and metal parts of the luminaire: | 
+ | Other than SELV | 
+ | between live parts of different polarity: | 
+ | between live parts and mounting surface: | 
+ | between live parts and metal parts: | 
+15 (10.2.2) | Electric strength test | 
+ | SELV | 
+ | between current-carrying parts of different polarity: | 
+ | between current-carrying parts and mounting surface: | 
+ | between current-carrying parts and metal parts of the luminaire: | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+Page 1 of 1
+[TABLE]
+15 (10.2.2) | Electric strength test | 
+ | Other than SELV | 
+ | between live parts of different polarity: | 
+ | between live parts and mounting surface….: | 
+ | between live parts and metal parts: | 
+15 (10.3) | Touch current or protective conductor current (mA): | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 10322/Provision For Earthing.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause No. | Test / Requirement name | Test result/ observation
+9 (7) | PROVISION FOR EARTHING
+ | Resistance < 0,5 : | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 10322/Resistance to heat, Fire & Tracking.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause No. | Test / Requirement name | Test result/ observation
+16 (13) | RESISTANCE TO HEAT, FIRE AND TRACKING
+16 (13.2.1) | Ball-pressure test: | 
+ | - part tested; temperature (C): | 
+ | - part tested; temperature (C): | 
+16 (13.3.1) | Needle-flame test (10 s): | 
+ | - part tested: | 
+16 (13.3.2) | Glowwire test (650C): | 
+ | - part tested: | 
+ | - part tested: | 
+16 (13.4.1) | Tracking test : | 
+ | - part tested: | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 10322/Temperature Measurement.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+ANNEX 2 | TABLE: Temperature measurements, thermal tests of Section 12
+ | Type reference: | 
+ | Lamp used: | 
+ | Lamp control gear used: | 
+ | Mounting position of luminaire: | 
+ | Supply wattage (W): | 
+ | Supply current (A): | 
+ | Calculated power factor: | 
+ | Table: measured temperatures corrected for ta:
+ | - test 1: rated voltage: | 
+ | - test 2: 1,06 times rated voltage or 1,05 times rated wattage: | 
+Temperature measurements, (C)
+Part | Clause 12.4 – normal
+ | test 1 | test 2 | Limit
+Supplementary information: Nil
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 15885/Creepage Distances And Clearances.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+7 (16) | TABLES: Creepage distances and clearances Model no.
+Table 3 | Minimum distances (mm) for a.c. (50 Hz) sinusoidal voltages
+RMS working voltage (V) not exceeding | 50 | 150 | 250 | 500 | 750 | 1000
+Creepage distances
+Required basic insulation, PTI < 600 | 1,2 | 1,6 | 2,5 | 5 | 8 | 10
+Measured between live part of different polarity |  |  |  |  |  | 
+Required reinforced insulation | 1,2 | 1,6 | 2,5 | 5 | 8 | 10
+Measured between live parts and fixing cover |  |  |  |  |  | 
+Clearance
+Required basic insulation | 2,0 | 3,2 | 3,6 | 4,8 | 6 | 8
+Measured between live part of different polarity |  |  |  |  |  | 
+Required reinforced insulation | 2,0 | 3,2 | 3,6 | 4,8 | 6 | 8
+Measured between live parts and fixing cover |  |  |  |  |  | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 15885/Electric Strength.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Cl. No | Test / Requirement name | Test result/ observation
+12 (12) | ELECTRIC STRENGTH
+ | Immediately after clause 11 electric strength test for 1 min | 
+ | Working voltage 42 V, test voltage 500 V | 
+ | Working voltage > 42 V 1000 V, test voltage (V): | 
+ | Basic insulation, 2U + 1000 V | 
+ | Supplementary insulation, 2U + 1000 V | 
+ | Double or reinforced insulation, 4U+2000 V | 
+ | No flashover or breakdown | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 15885/Moisture Resistance and Insulation.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Cl. No | Test / Requirement name | Test result/ observation
+11 (11) | MOISTURE RESISTANCE AND INSULATION
+ | After storage 48 h at 9195% relative humidity and 2030 C measuring of insulation resistance with d.c. 500 V, 1min (M): | 
+ | For basic insulation 2 M : | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 15885/Resistance to heat, Fire & Tracking.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause | Test / Requirement name | Test result/ observation
+19 (18) | RESISTANCE TO HEAT, FIRE AND TRACKING
+(18.1) | Ball-pressure test: | 
+ | - part tested; temperature (C) : | 
+ | - part tested; temperature (C) : | 
+(18.2) | Test of printed boards: | 
+ | - part tested : | 
+(18.3) | Glowwire test (650C): | 
+ | - part tested : | 
+ | - part tested : | 
+(18.4) | Needle flame test (10 s): | 
+ | - part tested : | 
+ | - part tested : | 
+(18.5) | Tracking test: | 
+ | - part tested : | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 16102/CAP Temperature Rise.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause No. | Test / Requirement name | Test result/ observation
+10 | Cap temperature rise
+ | The cap temperature rise Δts of the lamp shall not exceed 120 K. | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 16102/Creepage Distances And Clearances.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+14 | TABLE: Clearance and Creepage Distance Measurements
+clearance cl and creepage distance cr at/of: | UP(V) | Urms (V) | Required cl (mm) | Measured cl (mm) | Required cr (mm) | Measured cr (mm)
+Between Line-neutral |  |  |  |  |  | 
+Between Live and accessible conductive part |  |  |  |  |  | 
+Supplementary information: Nil
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 16102/Insulation Resistance & Electric Strength.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause No | Test / Requirement name | Test result/ observation
+8 | INSULATION RESISTANCE AND ELECTRIC STRENGTH
+8.1.1 | After storage 48 h at 9195% relative humidity and 25-35C measuring of insulation resistance with d.c. 500 V (M): | 
+ | 4 M b/w live part and accessible part: | 
+ | 5 M b/w shell and contacts of B22 cap | 
+8.2 | Immediately after insulation resistance test electric strength test for 1 min | 
+ | Basic insulation, 2U+1000 | 
+ | Reinforced insulation, 4U + 2750 V | 
+ | No flashover or breakdown* | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 16102/Resistance to heat, Fire & Tracking.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+11 | TABLE: Ball Pressure Test of Thermoplastics
+Allowed impression diameter (mm) : | <2mm | --
+Part | Test temperature (C) | Impression diameter (mm)
+Supplementary information: Nil
+[/TABLE]
+[TABLE]
+12 | TABLE: Glow Wire
+Part | Test temperature (C) | Time to self-extinguished flame
+Supplementary information: Nil
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 16103/Electric Strength.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Cl. No | Test / Requirement name | Test result/ observation
+12 (12) | ELECTRIC STRENGTH
+ | Immediately after clause 11 electric strength test for 1 min | 
+ | Working voltage 42 V, test voltage 500 V | 
+ | Working voltage > 42 V 1000 V, test voltage (V): | 
+ | Basic insulation, 2U + 1000 V | 
+ | Supplementary insulation, 2U + 1000 V | 
+ | Double or reinforced insulation, 4U+2000 V | 
+ | No flashover or breakdown | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 16103/Moisture Resistance and Insulation.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Cl. No | Test / Requirement name | Test result/ observation
+11 | MOISTURE RESISTANCE AND INSULATION
+ | After storage 48 h at 9195% relative humidity and 2030 C measuring of insulation resistance with d.c. 500 V (M): | 
+ | For basic insulation 2 M : | 
+ | For double or reinforced insulation4 M: | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]
+
+===== service 16103/Resistance to heat, Fire & Tracking.docx =====
+[TABLE]
+ | OBSERVATION SHEET | Doc. No.: PEL/QF/7.5/01Issue No.: 02Amend. No.: 02Amend. Date: 11.02.2025
+[/TABLE]
+[TABLE]
+SAMPLE CODE/ JOB ORDER NO. |  | ENVIRONMENTAL CONDITIONS | TEMP.:
+ |  |  | HUMIDITY:
+SAMPLE DESCRIPTION |  | DATE OF TESTING | START:
+ |  |  | END:
+ |  | REF.STANDARD/TEST METHOD | 
+EQUIPMENT USED (EQUIP.ID) | PEL/Cal-PEL/Cal- | PEL/Cal-PEL/Cal-
+[/TABLE]
+[TABLE]
+Clause | Test / Requirement name | Test result/ observation
+18 | RESISTANCE TO HEAT, FIRE AND TRACKING
+(18.1) | Ball-pressure test: | 
+ | - part tested; temperature (C) : | 
+(18.2) | Test of printed boards: | 
+ | - part tested : | 
+(18.3) | Glowwire test (650C): | 
+ | - part tested : | 
+(18.4) | Needle flame test (10 s): | 
+ | - part tested : | 
+(18.5) | Tracking test: | 
+ | - part tested : | 
+[/TABLE]
+[TABLE]
+Tested By: | Checked By:
+Sign.: | Sign.:
+Name: | Name:
+Date: | Date:
+[/TABLE]

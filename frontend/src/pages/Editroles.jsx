@@ -1,170 +1,183 @@
-import React, { use } from "react";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { KeyRound } from "lucide-react";
+import PageLoadingShell from "../components/PageLoadingShell";
+import Loader from "../components/Loader";
+import { adminTable } from "../components/AdminTableStyles";
 
-function editRoles() {
-  const Navigate = useNavigate();
+function EditRole() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const { token } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({
     name: "",
-    status: "",
+    is_active: true,
   });
+  const [pageLoading, setPageLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const fetchRoleData = async () => {
+  const fetchRoleData = useCallback(async () => {
+    if (!token || !id) {
+      setPageLoading(false);
+      return;
+    }
+    setPageLoading(true);
     try {
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_URL}/roles/${id}`,
-      );
-      setForm({
-        name: data.name,
-        status: data.status,
-      });
-    } catch (error) {
-      console.error("Error fetching role data:", error);
-    }
-  };
-
-  const handlesubmit = async (e) => {
-    // e.preventDefault();
-    try {
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/roles/${id}`,
-        JSON.stringify(form),
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true,
+        },
+      );
+      setForm({
+        name: data.name ?? "",
+        is_active: data.is_active !== false,
+      });
+    } catch (error) {
+      console.error("Error fetching role data:", error);
+      toast.error("Failed to load role");
+    } finally {
+      setPageLoading(false);
+    }
+  }, [id, token]);
 
+  const handleSubmit = async () => {
+    if (saving) return;
+    const name = form.name.trim();
+    if (!name) {
+      toast.error("Role name is required");
+      return;
+    }
+    try {
+      setSaving(true);
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/roles/${id}`,
+        { name, is_active: form.is_active },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           withCredentials: true,
         },
       );
       toast.success("Role updated successfully!");
-      Navigate("/roles");
+      navigate("/roles");
     } catch (error) {
       console.error("Error updating role:", error);
-      toast.error("Failed to update role. Please try again.");
+      const detail = error.response?.data?.detail;
+      toast.error(
+        typeof detail === "string" ? detail : "Failed to update role.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
   useEffect(() => {
-    // fetchRoleData();
-  }, [id]);
-
-  const modules = [
-    {
-      name: "User",
-      permissions: ["Read", "Create", "Update", "Delete", "Profile", "Banned"],
-    },
-    {
-      name: "Role",
-      permissions: ["Read", "Create", "Update", "Delete", "Banned"],
-    },
-    {
-      name: "Designation",
-      permissions: ["Read", "Create", "Update", "Delete"],
-    },
-    { name: "Department", permissions: ["Read", "Create", "Update", "Delete"] },
-    { name: "Leadsource", permissions: ["Read", "Create", "Update", "Delete"] },
-    { name: "Leadtype", permissions: ["Read", "Create", "Update", "Delete"] },
-    { name: "Leadstatus", permissions: ["Read", "Create", "Update", "Delete"] },
-    {
-      name: "Membershiptype",
-      permissions: ["Read", "Create", "Update", "Delete"],
-    },
-  ];
-
-  const [checked, setChecked] = useState({});
-
-  const togglePermission = (module, permission) => {
-    setChecked((prev) => ({
-      ...prev,
-      [`${module}-${permission}`]: !prev[`${module}-${permission}`],
-    }));
-  };
+    fetchRoleData();
+  }, [fetchRoleData]);
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      {/* Page Title */}
-      <h1 className="text-2xl font-semibold mb-6">Role</h1>
+    <PageLoadingShell loading={pageLoading} minHeight="min-h-[320px]">
+      <div className="flex flex-col gap-5">
+        <h2 className={adminTable.pageTitle}>Edit role</h2>
 
-      {/* Top Card */}
-      <div className="bg-white p-6 rounded shadow mb-6 flex items-center gap-6">
-        {/* Avatar */}
-        <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-3xl">
-          👤
-        </div>
+        <div className="flex max-w-xl flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600">
+              Name
+            </label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, name: e.target.value }))
+              }
+              disabled={saving || pageLoading}
+              placeholder="Role name"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/15 disabled:cursor-not-allowed disabled:bg-slate-50"
+            />
+          </div>
 
-        {/* Form */}
-        <div className="flex flex-col gap-3 w-96">
-          <input
-            type="text"
-            defaultValue="admin"
-            className="border p-2 rounded w-full"
-          />
-
-          <select className="border p-2 rounded w-full">
-            <option>Status</option>
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Permissions Section */}
-      <div className="bg-white rounded shadow">
-        {/* Header */}
-        <div className="bg-gray-600 text-white px-4 py-3 font-medium">
-          Module/Sub Module (Permissions)
-        </div>
-
-        {/* Permissions List */}
-        <div className="divide-y">
-          {modules.map((module) => (
-            <div
-              key={module.name}
-              className="flex items-center justify-between px-4 py-4"
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600">
+              Status
+            </label>
+            <select
+              value={form.is_active ? "active" : "inactive"}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  is_active: e.target.value === "active",
+                }))
+              }
+              disabled={saving || pageLoading}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/15 disabled:cursor-not-allowed disabled:bg-slate-50"
             >
-              <span className="font-semibold text-gray-700">{module.name}</span>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <p className="mt-2 text-xs text-slate-500">
+              Inactive roles cannot sign in; users with this role are blocked until
+              the role is active again.
+            </p>
+          </div>
 
-              <div className="flex gap-6">
-                {module.permissions.map((perm) => (
-                  <label
-                    key={perm}
-                    className="flex items-center gap-1 text-sm text-gray-700"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked[`${module.name}-${perm}`] || false}
-                      onChange={() => togglePermission(module.name, perm)}
-                      className="accent-blue-600"
-                    />
-                    {perm}
-                  </label>
-                ))}
-              </div>
-              <div className="mt-6"></div>
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-start items-center">
-          <button
-            className="bg-blue-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-blue-700 m-4 "
-            onClick={handlesubmit}
-          >
-            edit role
-          </button>
+          <div className="rounded-lg border border-slate-100 bg-slate-50/80 p-4">
+            <p className="text-sm font-medium text-slate-800">
+              Permission codes for this role
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              Choose which actions this role may perform on the Permissions page.
+              Users inherit those permissions through their assigned role.
+            </p>
+            <Link
+              to={`/permissions?roleId=${id}`}
+              className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-slate-900 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-900"
+            >
+              <KeyRound size={16} className="shrink-0" aria-hidden />
+              Open permissions for this role
+            </Link>
+          </div>
+
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button
+              type="button"
+              disabled={saving || pageLoading}
+              onClick={handleSubmit}
+              className={`${adminTable.btnAdd} inline-flex min-h-[42px] min-w-[8rem] items-center justify-center gap-2 px-5 disabled:opacity-50`}
+            >
+              {saving ? (
+                <>
+                  <Loader size={20} className="text-white" />
+                  Saving…
+                </>
+              ) : (
+                "Save"
+              )}
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => navigate("/roles")}
+              className="inline-flex min-h-[42px] items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </PageLoadingShell>
   );
 }
 
-export default editRoles;
+export default EditRole;

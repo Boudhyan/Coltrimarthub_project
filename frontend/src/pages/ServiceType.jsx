@@ -1,144 +1,181 @@
-import React from "react";
-import { useState } from "react";
-import { Pencil, Trash } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Pencil, Plus, Trash } from "lucide-react";
 import Popup from "../components/Popup";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import Loader from "../components/Loader";
+import { adminTable } from "../components/AdminTableStyles";
+import PageLoadingShell from "../components/PageLoadingShell";
+import { cell } from "../utils/cellDisplay";
 
 function ServiceType() {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("Service");
+  const [title, setTitle] = useState("Add Service Type");
+  const { token } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
+  const [serviceTypes, setServiceTypes] = useState([]);
+  const [editingName, setEditingName] = useState("");
+
+  const fetchTypes = useCallback(async () => {
+    if (!token) {
+      setInitialLoading(false);
+      return;
+    }
+    setInitialLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/service-types`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+      setServiceTypes(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to load service types");
+      setServiceTypes([]);
+    } finally {
+      setInitialLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchTypes();
+  }, [fetchTypes]);
+
+  const handleAdd = () => {
+    setTitle("Add Service Type");
+    setSelectedId(null);
+    setEditingName("");
+    setOpen(true);
+  };
+
+  const handleEdit = (id, name) => {
+    setTitle("Edit Service Type");
+    setSelectedId(id);
+    setEditingName(name);
+    setOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      setSelectedId(id);
+      setLoading(true);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/service-types/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+      setServiceTypes((prev) => prev.filter((t) => t.id !== id));
+      toast.success("Service type deleted");
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to delete service type");
+    } finally {
+      setLoading(false);
+      setSelectedId(null);
+    }
+  };
+
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col">
-      {/* TOP BAR */}
-      <div className="bg-white shadow px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xl">☰</span>
-          <span className="text-gray-600">Home</span>
-        </div>
-
-        <div className="flex items-center gap-6 text-gray-600">
-          <span>🔍</span>
-          <span>💬</span>
-          <span>🔔</span>
-          <button className="text-black font-semibold">Logout</button>
-        </div>
-      </div>
-
-      {/* MAIN CONTENT */}
-      <div className="p-6 flex-1">
-        <div className="flex justify-between m-b-4 items-center ">
-          <h2 className="text-lg font-semibold mb-4"> Service</h2>
+    <PageLoadingShell loading={initialLoading}>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className={adminTable.pageTitle}>Services</h2>
           <button
-            onClick={() => setOpen(true)}
-            className="text-white cursor-pointer bg-green-700 w-40 h-10 border border-amber-50 rounded-xl mb-3 "
+            type="button"
+            onClick={handleAdd}
+            disabled={initialLoading || loading}
+            className={`${adminTable.btnAdd} flex h-10 min-w-[10rem] items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50`}
           >
+            <Plus size={16} className="shrink-0" aria-hidden />
             Add Service
           </button>
         </div>
 
-        {/* CARD */}
-        <div className="bg-white shadow rounded p-4">
-          {/* BUTTONS + SEARCH */}
-          <div className="flex justify-between mb-4">
-            <div className="flex gap-2 flex-wrap">
-              {[
-                "Copy",
-                "CSV",
-                "Excel",
-                "PDF",
-                "Print",
-                "Column visibility",
-              ].map((btn) => (
-                <button
-                  key={btn}
-                  className="bg-gray-700 text-white text-sm px-3 py-1 rounded"
-                >
-                  {btn}
-                </button>
-              ))}
-            </div>
+        <div className={adminTable.wrap}>
+          <div className={adminTable.scroll}>
+            <table className={adminTable.table}>
+              <thead className={adminTable.thead}>
+                <tr>
+                  <th className={adminTable.th}>Service</th>
+                  <th className={adminTable.th}>Status</th>
+                  <th className={adminTable.thAction}>Action</th>
+                </tr>
+              </thead>
 
-            <div>
-              <input
-                placeholder="Search"
-                className="border rounded px-3 py-1"
-              />
-            </div>
-          </div>
-
-          {/* TABLE */}
-          <table className="w-full border text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border px-4 py-2 text-left">Service</th>
-
-                <th className="border px-4 py-2 text-left">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr>
-                <td className="border px-4 py-2">Ac Repair</td>
-
-                <td className="border px-4 py-2 flex justify-end ">
-                  <button
-                    onClick={() => setOpen(true)}
-                    className="text-white bg-green-700 w-10 h-10 border border-amber-50 rounded-xl mb-3 flex justify-center items-center "
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button className="text-white bg-red-600 w-10 h-10 border border-amber-50 rounded-xl mb-3  flex justify-center items-center">
-                    <Trash size={16} />
-                  </button>
-                </td>
-              </tr>
-
-              <tr>
-                <td className="border px-4 py-2">Fan Repair</td>
-
-                <td className="border px-4 py-2 flex justify-end ">
-                  <button className="text-white bg-green-700 w-10 h-10 border border-amber-50 rounded-xl mb-3 flex justify-center items-center ">
-                    <Pencil size={16} />
-                  </button>
-                  <button className="text-white bg-red-600 w-10 h-10 border border-amber-50 rounded-xl mb-3  flex justify-center items-center">
-                    <Trash size={16} />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          {/* TABLE FOOTER */}
-          <div className="flex justify-between items-center mt-4 text-sm">
-            <span>Showing 1 to 2 of 2 entries</span>
-
-            <div className="flex gap-2">
-              <button className="border px-3 py-1 rounded bg-gray-100">
-                Previous
-              </button>
-
-              <button className="bg-blue-600 text-white px-3 py-1 rounded">
-                1
-              </button>
-
-              <button className="border px-3 py-1 rounded bg-gray-100">
-                Next
-              </button>
-            </div>
+              <tbody className={adminTable.tbody}>
+                {!initialLoading && serviceTypes.length === 0 && (
+                  <tr className={adminTable.tr}>
+                    <td className={adminTable.td} colSpan={3}>
+                      <span className="text-slate-500">No service types yet.</span>
+                    </td>
+                  </tr>
+                )}
+                {serviceTypes.map((st) => (
+                  <tr key={st.id} className={adminTable.tr}>
+                    <td className={adminTable.td}>{cell(st.name)}</td>
+                    <td className={adminTable.td}>
+                      <span className="inline-flex h-9 min-w-[5rem] items-center justify-center rounded-lg bg-emerald-600 text-xs font-semibold text-white shadow-sm">
+                        Active
+                      </span>
+                    </td>
+                    <td className={adminTable.tdAction}>
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(st.id, st.name)}
+                        disabled={loading}
+                        className={`${adminTable.btnEditIcon} disabled:opacity-50`}
+                        aria-label="Edit service type"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(st.id)}
+                        disabled={loading}
+                        className={`${adminTable.btnDeleteIcon} disabled:opacity-50`}
+                        aria-label="Delete service type"
+                      >
+                        {loading && selectedId === st.id ? (
+                          <Loader size={16} className="text-white" />
+                        ) : (
+                          <Trash size={16} />
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <Popup open={open} setOpen={setOpen} title={title} />
-
-      {/* FOOTER */}
-      <div className="bg-white text-sm text-gray-600 px-6 py-3 border-t">
-        Copyright © 2022-2023{" "}
-        <span className="text-blue-600 font-semibold">
-          Marthub IT | Dashboard :: LEADS Management
-        </span>
-        . All rights reserved.
-      </div>
-    </div>
+      {open && (
+        <Popup
+          open={open}
+          setOpen={setOpen}
+          title={title}
+          serviceTypes={serviceTypes}
+          setServiceTypes={setServiceTypes}
+          serviceTypeId={selectedId}
+          serviceTypeName={editingName}
+        />
+      )}
+    </PageLoadingShell>
   );
 }
 

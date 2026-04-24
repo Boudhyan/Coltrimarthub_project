@@ -97,7 +97,10 @@
 #     db.commit()
 
 #     return {"message": "Company deleted"}
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.utils.db import get_db
@@ -106,17 +109,25 @@ from app.schemas.company_schema import CompanyCreate, CompanyResponse
 from app.utils.permissions import require_permission
 
 router = APIRouter(
-    prefix="/companies",
-    tags=["Companies"]
+    prefix="/customers",
+    tags=["Customers"]
 )
 
 
-@router.get("/", response_model=list[CompanyResponse])
+@router.get("", response_model=list[CompanyResponse])
 def get_companies(
     db: Session = Depends(get_db),
-    permission=Depends(require_permission("company_read"))
+    permission=Depends(require_permission("company_read")),
+    q: Optional[str] = Query(
+        None,
+        description="Filter customers by name (contains, case-insensitive)",
+    ),
 ):
-    return db.query(Company).all()
+    query = db.query(Company)
+    if q and str(q).strip():
+        term = f"%{str(q).strip()}%"
+        query = query.filter(func.lower(Company.name).like(func.lower(term)))
+    return query.order_by(func.lower(Company.name)).all()
 
 
 @router.get("/{company_id}", response_model=CompanyResponse)
@@ -128,12 +139,12 @@ def get_company(
     company = db.query(Company).filter(Company.id == company_id).first()
 
     if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
+        raise HTTPException(status_code=404, detail="Customer not found")
 
     return company
 
 
-@router.post("/", response_model=CompanyResponse)
+@router.post("", response_model=CompanyResponse)
 def create_company(
     data: CompanyCreate,
     db: Session = Depends(get_db),
@@ -142,7 +153,7 @@ def create_company(
     existing = db.query(Company).filter(Company.name == data.name).first()
 
     if existing:
-        raise HTTPException(status_code=400, detail="Company already exists")
+        raise HTTPException(status_code=400, detail="Customer already exists")
 
     company = Company(
         name=data.name,
@@ -168,7 +179,7 @@ def update_company(
     company = db.query(Company).filter(Company.id == company_id).first()
 
     if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
+        raise HTTPException(status_code=404, detail="Customer not found")
 
     company.name = data.name
     company.address = data.address
@@ -177,7 +188,7 @@ def update_company(
 
     db.commit()
 
-    return {"message": "Company updated"}
+    return {"message": "Customer updated"}
 
 
 @router.delete("/{company_id}")
@@ -189,9 +200,9 @@ def delete_company(
     company = db.query(Company).filter(Company.id == company_id).first()
 
     if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
+        raise HTTPException(status_code=404, detail="Customer not found")
 
     db.delete(company)
     db.commit()
 
-    return {"message": "Company deleted"}
+    return {"message": "Customer deleted"}

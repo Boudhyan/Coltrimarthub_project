@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.utils.db import get_db
@@ -14,6 +15,7 @@ from app.schemas.user_schema import (
 )
 from app.utils.security import hash_password
 from app.utils.permissions import require_permission
+from app.utils.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/users",
@@ -21,7 +23,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=UserResponse)
+@router.post("", response_model=UserResponse)
 def create_user(
     data: UserCreate,
     db: Session = Depends(get_db),
@@ -123,7 +125,7 @@ def create_user(
     }
 
 
-@router.get("/", response_model=list[UserResponse])
+@router.get("", response_model=list[UserResponse])
 def get_users(
     db: Session = Depends(get_db),
     permission=Depends(require_permission("user_read"))
@@ -148,6 +150,49 @@ def get_users(
             "is_active": user.is_active
         })
 
+    return response
+
+
+@router.get("/by-role/{role_name}", response_model=list[UserResponse])
+def get_users_by_role(
+    role_name: str,
+    db: Session = Depends(get_db),
+    permission=Depends(require_permission("user_read")),
+):
+    """Users whose role name matches (case-insensitive), active only."""
+    role = (
+        db.query(Role)
+        .filter(func.lower(Role.name) == role_name.strip().lower())
+        .first()
+    )
+    if not role:
+        return []
+    users = (
+        db.query(User)
+        .filter(User.role_id == role.id, User.is_active.is_(True))
+        .all()
+    )
+    response = []
+    for user in users:
+        r = db.query(Role).filter(Role.id == user.role_id).first()
+        department = (
+            db.query(Department).filter(Department.id == user.department_id).first()
+        )
+        designation = (
+            db.query(Designation).filter(Designation.id == user.designation_id).first()
+        )
+        response.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "phone": user.phone,
+                "role_name": r.name if r else None,
+                "department_name": department.name if department else None,
+                "designation_name": designation.name if designation else None,
+                "is_active": user.is_active,
+            }
+        )
     return response
 
 
@@ -188,7 +233,8 @@ def update_user(
     user_id: int,
     data: UserUpdate,
     db: Session = Depends(get_db),
-    permission=Depends(require_permission("user_update"))
+    permission=Depends(require_permission("user_update")),
+    current_user: User = Depends(get_current_user),
 ):
     user = db.query(User).filter(
         User.id == user_id
@@ -226,6 +272,16 @@ def update_user(
                 detail="Role not found"
             )
 
+        if (
+            user_id == current_user.id
+            and current_user.role_id is not None
+            and role.id != current_user.role_id
+        ):
+            raise HTTPException(
+                status_code=403,
+                detail="You cannot change your own role",
+            )
+
     if data.department_name:
         department = db.query(Department).filter(
             Department.name == data.department_name
@@ -251,9 +307,12 @@ def update_user(
     user.username = data.username
     user.email = data.email
     user.phone = data.phone
-    user.role_id = role.id if role else None
-    user.department_id = department.id if department else None
-    user.designation_id = designation.id if designation else None
+    if data.role_name:
+        user.role_id = role.id
+    if data.department_name:
+        user.department_id = department.id if department else None
+    if data.designation_name:
+        user.designation_id = designation.id if designation else None
 
     db.commit()
 

@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.utils.db import get_db
 from app.models.user import User
+from app.models.role import Role
+from app.utils.privileged import user_has_full_access
 from app.utils.security import SECRET_KEY, ALGORITHM
 
 
@@ -53,5 +55,14 @@ def get_current_user(
             status_code=403,
             detail="User is disabled"
         )
+
+    if user.role_id is not None:
+        role = db.query(Role).filter(Role.id == user.role_id).first()
+        if role is not None and not role.is_active:
+            if not user_has_full_access(db, user):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Role is disabled"
+                )
 
     return user

@@ -1,141 +1,125 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 import ActionDropdown from "../components/Actionbutton";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import LogoutButton from "../components/logoutbutton";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import toast from "react-hot-toast";
+import { adminTable } from "../components/AdminTableStyles";
+import PageLoadingShell from "../components/PageLoadingShell";
+import { cell } from "../utils/cellDisplay";
 
 function Users() {
   const { token } = useSelector((state) => state.auth);
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
   const [open, setOpen] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    if (!token) {
+      setInitialLoading(false);
+      return;
+    }
+    setInitialLoading(true);
     try {
-      const { data } = await axios.get("http://127.0.0.1:8000/users", {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Assuming token is stored in localStorage
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/users`,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
-      setUsers(data);
-      console.log("Fetched users:", data);
+      );
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching users:", error);
+      toast.error("Failed to load users");
+      setUsers([]);
+    } finally {
+      setInitialLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
-    if (token) {
-      fetchUsers();
-    }
-  }, [token, users.length]);
+    fetchUsers();
+  }, [fetchUsers]);
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col">
-      {/* TOP BAR */}
-      <div className="bg-white shadow px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xl">☰</span>
-          <span className="text-gray-600">Home</span>
-        </div>
-
-        <div className="flex items-center gap-6 text-gray-600">
-          <span>🔍</span>
-          <span>💬</span>
-          <span>🔔</span>
-          <LogoutButton />
-        </div>
-      </div>
-
-      {/* MAIN CONTENT */}
-      <div className="p-6 flex-1">
-        <div className="flex justify-between m-b-4 items-center ">
-          <h2 className="text-lg font-semibold mb-4">Users List</h2>
-          <Link to="/add-user">
-            <button className="text-white cursor-pointer bg-green-700 w-40 h-10 border border-amber-50 rounded-xl mb-3 flex justify-center items-center gap-2">
+    <PageLoadingShell loading={initialLoading} minHeight="min-h-[320px]">
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className={adminTable.pageTitle}>Users</h2>
+          <Link to="/add-user" className={initialLoading ? "pointer-events-none" : ""}>
+            <button
+              type="button"
+              disabled={initialLoading}
+              className={`${adminTable.btnAdd} flex h-10 min-w-[10rem] cursor-pointer items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50`}
+            >
               <Plus size={16} /> Add Users
             </button>
           </Link>
         </div>
 
-        {/* CARD */}
-        <div className="bg-white shadow rounded p-4">
-          {/* BUTTONS + SEARCH */}
-          <div className="flex justify-between mb-4">
-            <div className="flex gap-2 flex-wrap">
-              {[
-                "Copy",
-                "CSV",
-                "Excel",
-                "PDF",
-                "Print",
-                "Column visibility",
-              ].map((btn) => (
-                <button
-                  key={btn}
-                  className="bg-gray-700 text-white text-sm px-3 py-1 rounded"
-                >
-                  {btn}
-                </button>
-              ))}
-            </div>
+        <div className={adminTable.wrap}>
+          <div className={adminTable.scroll}>
+            <table className={`${adminTable.table} min-w-[960px]`}>
+              <thead className={adminTable.thead}>
+                <tr>
+                  <th className={adminTable.th}>Name</th>
+                  <th className={adminTable.th}>User ID</th>
+                  <th className={adminTable.th}>Phone</th>
+                  <th className={adminTable.th}>Email</th>
+                  <th className={adminTable.th}>Designation</th>
+                  <th className={adminTable.th}>Department</th>
+                  <th className={adminTable.th}>Role</th>
+                  <th className={adminTable.th}>Status</th>
+                  <th className={adminTable.thAction}>Action</th>
+                </tr>
+              </thead>
 
-            <div>
-              <input
-                placeholder="Search"
-                className="border rounded px-3 py-1"
-              />
-            </div>
-          </div>
-
-          {/* TABLE */}
-          <table className="w-full border text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border px-4 py-2 text-left">Name</th>
-                <th className="border px-4 py-2 text-left">UserId</th>
-                <th className="border px-4 py-2 text-left">Phone</th>
-                <th className="border px-4 py-2 text-left">Email</th>
-                <th className="border px-4 py-2 text-left">Designation</th>
-                <th className="border px-4 py-2 text-left">Department</th>
-                <th className="border px-4 py-2 text-left">Role</th>
-                <th className="border px-4 py-2 text-left">Colour</th>
-                <th className="border px-4 py-2 text-left">Status</th>
-                <th className="border px-4 py-2 text-left">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {users.length > 0 &&
-                users.map((user) => (
-                  <tr key={user.id}>
-                    <td className="border px-4 py-2">{user?.username}</td>
-                    <td className="border px-4 py-2">{user?.id}</td>
-                    <td className="border px-4 py-2">{user?.phone}</td>
-                    <td className="border px-4 py-2">{user?.email}</td>
-                    <td className="border px-4 py-2">{user?.designation}</td>
-                    <td className="border px-4 py-2">{user?.department}</td>
-                    <td className="border px-4 py-2">{user?.role_name}</td>
-                    <td className="border px-4 py-2">{user?.colour}</td>
-                    <td className="border px-4 py-2">
-                      {user.isactive ? "Active" : "inactive"}
+              <tbody className={adminTable.tbody}>
+                {!initialLoading && users.length === 0 && (
+                  <tr className={adminTable.tr}>
+                    <td className={adminTable.td} colSpan={9}>
+                      <span className="text-slate-500">No users found.</span>
+                    </td>
+                  </tr>
+                )}
+                {users.map((user) => (
+                  <tr key={user.id} className={adminTable.tr}>
+                    <td className={adminTable.td}>{cell(user?.username)}</td>
+                    <td className={adminTable.td}>{cell(user?.id)}</td>
+                    <td className={adminTable.td}>{cell(user?.phone)}</td>
+                    <td className={`${adminTable.td} max-w-[220px] truncate`}>
+                      {cell(user?.email)}
+                    </td>
+                    <td className={adminTable.td}>
+                      {cell(user?.designation_name ?? user?.designation)}
+                    </td>
+                    <td className={adminTable.td}>
+                      {cell(user?.department_name ?? user?.department)}
+                    </td>
+                    <td className={adminTable.td}>{cell(user?.role_name)}</td>
+                    <td className={adminTable.td}>
+                      <span
+                        className={
+                          user.is_active
+                            ? "inline-flex rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-600/20"
+                            : "inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-400/30"
+                        }
+                      >
+                        {user.is_active ? "Active" : "Inactive"}
+                      </span>
                     </td>
 
-                    <td
-                      className="border px-4 py-2 flex justify-end gap
-                "
-                    >
+                    <td className={adminTable.tdAction}>
                       <ActionDropdown
                         id={user.id}
                         selectedUser={selectedUser}
                         setSelectedUser={setSelectedUser}
-                        users={users}
                         setUsers={setUsers}
                         open={open}
                         setOpen={setOpen}
@@ -143,39 +127,12 @@ function Users() {
                     </td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
-
-          {/* TABLE FOOTER */}
-          <div className="flex justify-between items-center mt-4 text-sm">
-            <span>Showing 1 to 2 of 2 entries</span>
-
-            <div className="flex gap-2">
-              <button className="border px-3 py-1 rounded bg-gray-100">
-                Previous
-              </button>
-
-              <button className="bg-blue-600 text-white px-3 py-1 rounded">
-                1
-              </button>
-
-              <button className="border px-3 py-1 rounded bg-gray-100">
-                Next
-              </button>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-
-      {/* FOOTER */}
-      <div className="bg-white text-sm text-gray-600 px-6 py-3 border-t">
-        Copyright © 2022-2023{" "}
-        <span className="text-blue-600 font-semibold">
-          Marthub IT | Dashboard :: LEADS Management
-        </span>
-        . All rights reserved.
-      </div>
-    </div>
+    </PageLoadingShell>
   );
 }
 

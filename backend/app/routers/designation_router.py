@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[DesignationResponse])
+@router.get("", response_model=list[DesignationResponse])
 def get_designations(
     db: Session = Depends(get_db),
     permission=Depends(require_permission("designation_read"))
@@ -34,7 +34,7 @@ def get_designation(
     return designation
 
 
-@router.post("/", response_model=DesignationResponse)
+@router.post("", response_model=DesignationResponse)
 def create_designation(
     data: DesignationCreate,
     db: Session = Depends(get_db),

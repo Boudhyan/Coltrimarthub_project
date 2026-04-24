@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Pencil, Trash } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Pencil, Plus, Trash } from "lucide-react";
 import Popup from "../components/Popup";
-import LogoutButton from "../components/logoutbutton";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import Loader from "../components/Loader";
+import { adminTable } from "../components/AdminTableStyles";
+import PageLoadingShell from "../components/PageLoadingShell";
+import { cell } from "../utils/cellDisplay";
 
 function Designation() {
   const [open, setOpen] = useState(false);
@@ -13,11 +15,11 @@ function Designation() {
   const { token } = useSelector((state) => state.auth);
 
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [designationName, setDesignationName] = useState("");
   const [selectedDesignation, setSelectedDesignation] = useState("");
   const [designations, setDesignations] = useState([]);
 
-  // ✅ EDIT
   const handleEdit = (id, name) => {
     setSelectedDesignation(id);
     setTitle("Edit Designation");
@@ -25,7 +27,6 @@ function Designation() {
     setOpen(true);
   };
 
-  // ✅ DELETE
   const handleDelete = async (id) => {
     try {
       setSelectedDesignation(id);
@@ -50,8 +51,12 @@ function Designation() {
     }
   };
 
-  // ✅ FETCH
-  const fetchDesignations = async () => {
+  const fetchDesignations = useCallback(async () => {
+    if (!token) {
+      setInitialLoading(false);
+      return;
+    }
+    setInitialLoading(true);
     try {
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_URL}/designations`,
@@ -63,15 +68,20 @@ function Designation() {
           withCredentials: true,
         },
       );
-      console.log("fetched designations: ", data);
-
-      setDesignations(data);
+      setDesignations(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to load designations");
+      setDesignations([]);
+    } finally {
+      setInitialLoading(false);
     }
-  };
+  }, [token]);
 
-  // ✅ ADD
+  useEffect(() => {
+    fetchDesignations();
+  }, [fetchDesignations]);
+
   const handleAdd = () => {
     setTitle("Add Designation");
     setDesignationName("");
@@ -79,110 +89,100 @@ function Designation() {
     setOpen(true);
   };
 
-  useEffect(() => {
-    fetchDesignations();
-  }, []);
-
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col">
-      {/* TOP BAR */}
-      <div className="bg-white shadow px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xl">☰</span>
-          <span className="text-gray-600">Home</span>
-        </div>
-
-        <div className="flex items-center gap-6 text-gray-600">
-          <span>🔍</span>
-          <span>💬</span>
-          <span>🔔</span>
-          <LogoutButton />
-        </div>
-      </div>
-
-      {/* MAIN */}
-      <div className="p-6 flex-1">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold mb-4">Designation</h2>
+    <PageLoadingShell loading={initialLoading}>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className={adminTable.pageTitle}>Designation</h2>
 
           <button
+            type="button"
             onClick={handleAdd}
-            className="text-white bg-green-700 w-40 h-10 rounded-xl mb-3"
+            disabled={initialLoading || loading}
+            className={`${adminTable.btnAdd} flex h-10 min-w-[10rem] items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50`}
           >
+            <Plus size={16} className="shrink-0" aria-hidden />
             Add Designation
           </button>
         </div>
 
-        {/* TABLE CARD */}
-        <div className="bg-white shadow rounded p-4">
-          <table className="w-full border text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border px-4 py-2 text-left">Designation</th>
-                <th className="border px-4 py-2 text-left">Status</th>
-                <th className="border px-4 py-2 text-left">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {designations.map((item) => (
-                <tr key={item.id}>
-                  <td className="border px-4 py-2">{item.name}</td>
-
-                  <td className="border px-4 py-2">
-                    <button className="text-white bg-green-700 w-20 h-10 rounded-xl">
-                      Active
-                    </button>
-                  </td>
-
-                  <td className="border px-4 py-2 flex justify-end gap-2">
-                    <button
-                      onClick={() => handleEdit(item.id, item.name)}
-                      className="bg-green-700 w-10 h-10 rounded-xl flex items-center justify-center text-white"
-                    >
-                      <Pencil size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="bg-red-600 w-10 h-10 rounded-xl flex items-center justify-center text-white"
-                      disabled={loading}
-                    >
-                      {loading && selectedDesignation === item.id ? (
-                        <Loader size={16} color="#fff" />
-                      ) : (
-                        <Trash size={16} />
-                      )}
-                    </button>
-                  </td>
+        <div className={adminTable.wrap}>
+          <div className={adminTable.scroll}>
+            <table className={adminTable.table}>
+              <thead className={adminTable.thead}>
+                <tr>
+                  <th className={adminTable.th}>Designation</th>
+                  <th className={adminTable.th}>Status</th>
+                  <th className={adminTable.thAction}>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody className={adminTable.tbody}>
+                {!initialLoading && designations.length === 0 && (
+                  <tr className={adminTable.tr}>
+                    <td className={adminTable.td} colSpan={3}>
+                      <span className="text-slate-500">No designations found.</span>
+                    </td>
+                  </tr>
+                )}
+                {designations.map((item) => (
+                  <tr key={item.id} className={adminTable.tr}>
+                    <td className={adminTable.td}>{cell(item.name)}</td>
+
+                    <td className={adminTable.td}>
+                      <button
+                        type="button"
+                        className="inline-flex h-9 min-w-[5rem] items-center justify-center rounded-lg bg-emerald-600 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                      >
+                        Active
+                      </button>
+                    </td>
+
+                    <td className={adminTable.tdAction}>
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(item.id, item.name)}
+                        disabled={loading}
+                        className={`${adminTable.btnEditIcon} disabled:opacity-50`}
+                        aria-label="Edit designation"
+                      >
+                        <Pencil size={16} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(item.id)}
+                        className={`${adminTable.btnDeleteIcon} disabled:opacity-50`}
+                        disabled={loading}
+                        aria-label="Delete designation"
+                      >
+                        {loading && selectedDesignation === item.id ? (
+                          <Loader size={16} className="text-white" />
+                        ) : (
+                          <Trash size={16} />
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      {/* ✅ POPUP */}
-      {open && (
-        <Popup
-          open={open}
-          setOpen={setOpen}
-          title={title}
-          designations={designations}
-          setDesignations={setDesignations}
-          designationId={selectedDesignation}
-          designationName={designationName}
-        />
-      )}
-
-      {/* FOOTER */}
-      <div className="bg-white text-sm text-gray-600 px-6 py-3 border-t">
-        Copyright © 2022-2023{" "}
-        <span className="text-blue-600 font-semibold">
-          Marthub IT | Dashboard
-        </span>
+        {open && (
+          <Popup
+            open={open}
+            setOpen={setOpen}
+            title={title}
+            designations={designations}
+            setDesignations={setDesignations}
+            designationId={selectedDesignation}
+            designationName={designationName}
+          />
+        )}
       </div>
-    </div>
+    </PageLoadingShell>
   );
 }
 

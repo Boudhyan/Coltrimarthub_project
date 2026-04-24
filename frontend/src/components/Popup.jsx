@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Loader from "./Loader";
+import { adminTable } from "./AdminTableStyles";
 
 export default function Popup({
   open,
@@ -21,6 +22,12 @@ export default function Popup({
   setDesignations,
   designationName,
   designationId,
+
+  // Service type props (Service Master)
+  serviceTypes,
+  setServiceTypes,
+  serviceTypeId,
+  serviceTypeName,
 }) {
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -35,8 +42,10 @@ export default function Popup({
       setInputValue(departmentName || "");
     } else if (title.includes("Designation")) {
       setInputValue(designationName || "");
+    } else if (title.includes("Service Type")) {
+      setInputValue(serviceTypeName || "");
     }
-  }, [title, departmentName, designationName]);
+  }, [title, departmentName, designationName, serviceTypeName]);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -118,6 +127,44 @@ export default function Popup({
         toast.success("Designation updated!");
       }
 
+      // ======================
+      // Service types (Service Master)
+      // ======================
+      else if (title === "Add Service Type") {
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_API_URL}/service-types`,
+          { name: inputValue },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          },
+        );
+
+        setServiceTypes((prev) => [...prev, data]);
+        toast.success("Service type added!");
+      } else if (title === "Edit Service Type") {
+        await axios.put(
+          `${import.meta.env.VITE_API_URL}/service-types/${serviceTypeId}`,
+          { name: inputValue },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          },
+        );
+
+        setServiceTypes((prev) =>
+          prev.map((item) =>
+            item.id === serviceTypeId ? { ...item, name: inputValue } : item,
+          ),
+        );
+
+        toast.success("Service type updated!");
+      }
+
       setOpen(false);
     } catch (error) {
       console.error(error);
@@ -141,8 +188,10 @@ export default function Popup({
               <div className="flex justify-between items-center border-b px-5 py-3">
                 <h2 className="text-lg font-semibold">{title}</h2>
                 <button
-                  onClick={() => setOpen(false)}
-                  className="text-gray-500 text-xl"
+                  type="button"
+                  onClick={() => !loading && setOpen(false)}
+                  disabled={loading}
+                  className="text-xl text-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   ×
                 </button>
@@ -155,9 +204,10 @@ export default function Popup({
 
                   <input
                     type="text"
-                    className="w-full border rounded p-2"
+                    className="w-full rounded border p-2 disabled:cursor-not-allowed disabled:bg-slate-100"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -165,18 +215,28 @@ export default function Popup({
               {/* Footer */}
               <div className="flex justify-between border-t px-5 py-4">
                 <button
-                  onClick={() => setOpen(false)}
-                  className="bg-gray-200 px-4 py-2 rounded"
+                  type="button"
+                  onClick={() => !loading && setOpen(false)}
+                  disabled={loading}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Close
                 </button>
 
                 <button
-                  className="bg-blue-600 text-white px-5 py-2 rounded"
+                  type="button"
+                  className={`${adminTable.btnAdd} inline-flex min-h-[42px] min-w-[8rem] items-center justify-center gap-2 text-sm disabled:opacity-60`}
                   onClick={handleSubmit}
                   disabled={loading}
                 >
-                  {loading ? <Loader size={20} color="#fff" /> : title}
+                  {loading ? (
+                    <>
+                      <Loader size={20} className="text-white" />
+                      <span>Saving…</span>
+                    </>
+                  ) : (
+                    title
+                  )}
                 </button>
               </div>
             </div>

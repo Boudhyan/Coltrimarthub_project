@@ -1,66 +1,127 @@
-import React from "react";
-import { Link, Links } from "react-router-dom";
-import { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
-  Users,
-  Shield,
-  UserCog,
   ChevronDown,
   Activity,
-  Crown,
+  Wrench,
+  ClipboardList,
+  List,
+  UserCheck,
 } from "lucide-react";
+import { canAccess, canAccessAny } from "../utils/canAccess";
+import { P } from "../constants/routePermissions";
 
-function ServiceComp() {
-  const [openUsers, setOpenUsers] = useState(false);
+const subBase =
+  "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition";
+const subInactive = "text-white/90 hover:bg-white/10 hover:text-white";
+const subActive = "bg-white text-slate-900 shadow-sm ring-1 ring-white/20";
+
+export default function ServiceComp({ onNavigate = () => {} }) {
+  const auth = useSelector((state) => state.auth);
+  const fullAccess = Boolean(auth.fullAccess);
+  const { pathname } = useLocation();
+  const [open, setOpen] = useState(() =>
+    ["/services", "/service-requests", "/service-request", "/my-assignments"].some(
+      (p) => pathname === p || pathname.startsWith(`${p}/`),
+    ),
+  );
+
+  const items = useMemo(
+    () =>
+      [
+        {
+          to: "/services",
+          perm: P.SERVICE_TYPE_READ,
+          icon: Wrench,
+          label: "Services",
+        },
+        {
+          to: "/service-requests",
+          perm: P.SERVICE_REQUEST_READ,
+          icon: List,
+          label: "Service requests",
+        },
+        {
+          to: "/service-request",
+          perm: P.SERVICE_REQUEST_CREATE,
+          icon: ClipboardList,
+          label: "New service request",
+          end: true,
+        },
+        {
+          to: "/my-assignments",
+          engineerOnly: true,
+          icon: UserCheck,
+          label: "My assignments",
+          end: true,
+        },
+      ].filter((x) => {
+        if (x.engineerOnly) return !fullAccess;
+        if (x.anyOf) return canAccessAny(auth, x.anyOf);
+        return canAccess(auth, x.perm);
+      }),
+    [auth, fullAccess],
+  );
+
+  useEffect(() => {
+    if (
+      ["/services", "/service-requests", "/service-request", "/my-assignments"].some(
+        (p) => pathname === p || pathname.startsWith(`${p}/`),
+      )
+    ) {
+      setOpen(true);
+    }
+  }, [pathname]);
+
+  if (items.length === 0) return null;
 
   return (
-    <div>
+    <div className="mt-4">
       <ul className="space-y-1">
-        {/* Parent Menu */}
         <li>
           <button
-            onClick={() => setOpenUsers(!openUsers)}
-            className="flex items-center justify-between w-full text-white font-bold text-[15px] hover:text-slate-900 hover:bg-gray-100 rounded px-4 py-2 transition-all"
+            type="button"
+            onClick={() => setOpen(!open)}
+            className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-[15px] font-semibold text-white transition hover:bg-white/10"
           >
-            <div className="flex items-center gap-2">
-              <Activity size={18} />
-              Service Master
-            </div>
-
+            <span className="flex items-center gap-2">
+              <Activity className="h-5 w-5 shrink-0 text-white/90" aria-hidden />
+              Service master
+            </span>
             <ChevronDown
               size={18}
-              className={`transition-transform duration-300 ${
-                openUsers ? "rotate-180" : ""
+              className={`shrink-0 text-white/80 transition-transform duration-300 ${
+                open ? "rotate-180" : ""
               }`}
+              aria-hidden
             />
           </button>
 
-          {/* Dropdown Items */}
           <div
             className={`overflow-hidden transition-all duration-300 ${
-              openUsers ? "max-h-40 mt-1" : "max-h-0"
+              open ? "mt-1 max-h-96" : "max-h-0"
             }`}
           >
-            <ul className="ml-6 space-y-1">
-              <li>
-                <Link
-                  to="/service-type"
-                  className="flex items-center gap-2 text-white text-sm hover:text-slate-900 hover:bg-gray-100 rounded px-3 py-2 transition-all"
-                >
-                  <Crown size={16} />
-                  Service Type
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/service-request"
-                  className="flex items-center gap-2 text-white text-sm hover:text-slate-900 hover:bg-gray-100 rounded px-3 py-2 transition-all"
-                >
-                  <Crown size={16} />
-                  Service Request
-                </Link>
-              </li>
+            <ul className="ml-2 space-y-0.5 border-l border-white/15 pl-3">
+              {items.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.to}>
+                    <NavLink
+                      to={item.to}
+                      end={item.end}
+                      onClick={onNavigate}
+                      className={({ isActive }) =>
+                        `${subBase} ${isActive ? subActive : subInactive}`
+                      }
+                    >
+                      <Icon size={16} className="shrink-0 opacity-90" />
+                      {item.label}
+                    </NavLink>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </li>
@@ -68,5 +129,3 @@ function ServiceComp() {
     </div>
   );
 }
-
-export default ServiceComp;

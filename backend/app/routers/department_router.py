@@ -110,7 +110,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[DepartmentResponse])
+@router.get("", response_model=list[DepartmentResponse])
 def get_departments(
     db: Session = Depends(get_db),
     permission=Depends(require_permission("department_read"))
@@ -132,7 +132,7 @@ def get_department(
     return department
 
 
-@router.post("/", response_model=DepartmentResponse)
+@router.post("", response_model=DepartmentResponse)
 def create_department(
     data: DepartmentCreate,
     db: Session = Depends(get_db),

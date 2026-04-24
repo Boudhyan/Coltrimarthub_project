@@ -1,33 +1,72 @@
-import { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import PageLoadingShell from "../components/PageLoadingShell";
+import Loader from "../components/Loader";
 
 function Edituser() {
-  const { token } = useSelector((state) => state.auth);
+  const { token, userId } = useSelector((state) => state.auth);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [listsLoading, setListsLoading] = useState(true);
+  const [roles, setRoles] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [designations, setDesignations] = useState([]);
+
   const [form, setForm] = useState({
     username: "",
     role_name: "",
     email: "",
     phone: "",
-    color: "",
-    statusCondition: "",
-    joiningDate: "",
-    parent: "",
-    department: "",
-    designation: "",
-    gender: "",
-    allLead: true,
-    newLead: true,
+    department_name: "",
+    designation_name: "",
   });
 
-  const Navigate = useNavigate();
-
+  const navigate = useNavigate();
   const { id } = useParams();
+  const isSelf =
+    id != null && userId != null && String(id) === String(userId);
 
-  const fetchUserData = async () => {
+  const loadLists = useCallback(async () => {
+    if (!token) {
+      setListsLoading(false);
+      return;
+    }
+    setListsLoading(true);
+    try {
+      const [r, d, g] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_API_URL}/roles`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }),
+        axios.get(`${import.meta.env.VITE_API_URL}/departments`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }),
+        axios.get(`${import.meta.env.VITE_API_URL}/designations`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }),
+      ]);
+      setRoles(Array.isArray(r.data) ? r.data : []);
+      setDepartments(Array.isArray(d.data) ? d.data : []);
+      setDesignations(Array.isArray(g.data) ? g.data : []);
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to load dropdown data");
+    } finally {
+      setListsLoading(false);
+    }
+  }, [token]);
+
+  const fetchUserData = useCallback(async () => {
+    if (!token || !id) {
+      setPageLoading(false);
+      return;
+    }
+    setPageLoading(true);
     try {
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_URL}/users/${id}`,
@@ -39,43 +78,62 @@ function Edituser() {
           withCredentials: true,
         },
       );
-      console.log("Fetched user data:", data);
       setForm({
-        username: data.name,
-        role_name: data.role,
-        email: data.email,
-        phone: data.phone,
-        color: data.color,
-        statusCondition: data.statusCondition,
-        joiningDate: data.joiningDate,
-        parent: data.parent,
-        department: data.department,
-        designation: data.designation,
+        username: data.username ?? "",
+        role_name: data.role_name ?? "",
+        email: data.email ?? "",
+        phone: data.phone ?? "",
+        department_name: data.department_name ?? "",
+        designation_name: data.designation_name ?? "",
       });
     } catch (error) {
       console.error("Error fetching user data:", error);
-      
+      toast.error("Failed to load user");
+    } finally {
+      setPageLoading(false);
     }
-  };
+  }, [id, token]);
+
+  useEffect(() => {
+    loadLists();
+  }, [loadLists]);
 
   useEffect(() => {
     fetchUserData();
-  }, [id]);
+  }, [fetchUserData]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlesubmit = async (e) => {
-    // e.preventDefault();
+  const handlesubmit = async () => {
+    if (saving) return;
+    if (!form.username.trim()) {
+      toast.error("Username is required");
+      return;
+    }
+    if (!form.email.trim()) {
+      toast.error("Email is required");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      toast.error("Enter a valid email address");
+      return;
+    }
     try {
+      setSaving(true);
+      const payload = {
+        username: form.username.trim(),
+        email: form.email.trim(),
+        phone: form.phone?.trim() || null,
+        role_name: form.role_name || null,
+        department_name: form.department_name || null,
+        designation_name: form.designation_name || null,
+      };
       await axios.put(
         `${import.meta.env.VITE_API_URL}/users/${id}`,
-        JSON.stringify(form),
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -85,216 +143,153 @@ function Edituser() {
         },
       );
       toast.success("User updated successfully!");
-      Navigate("/users");
+      navigate("/users");
     } catch (error) {
       console.error("Error updating user:", error);
-      toast.error("Failed to update user. Please try again.");
+      const msg = error.response?.data?.detail;
+      toast.error(
+        typeof msg === "string" ? msg : "Failed to update user. Please try again.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
+  const inputClass =
+    "w-full rounded-xl border border-slate-200 px-3 py-2 text-[15px] text-slate-900 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/15";
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      {/* Page Title */}
-      <h1 className="text-2xl font-semibold mb-4">Edit User</h1>
+    <PageLoadingShell loading={pageLoading || listsLoading} minHeight="min-h-screen">
+      <div className="min-h-screen bg-gray-100 p-6">
+        <h1 className="mb-4 text-2xl font-semibold text-slate-900">Edit user</h1>
+        <p className="mb-4 text-sm text-slate-600">
+          Updates map to columns on <code className="rounded bg-slate-100 px-1">users</code>:
+          username, email, phone, role_id, department_id, designation_id.
+        </p>
+        {isSelf ? (
+          <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            You cannot change your own role here. Another administrator can update your
+            role if needed.
+          </p>
+        ) : null}
 
-      {/* Note bar */}
-      <div className="bg-gray-600 text-white px-4 py-2 rounded-t">
-        *Note fields Marked With "*" Are Mandatory
-      </div>
-
-      <div className="bg-white p-6 rounded-b shadow">
-        <div className="grid grid-cols-2 gap-6">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
-            <input
-              name="username"
-              value={form.username || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Role</label>
-            <select
-              name="role"
-              value={form.role_name || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            >
-              <option>admin</option>
-              <option>manager</option>
-            </select>
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              name="email"
-              value={form.email || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-
-          {/* Color */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Color Indication
-            </label>
-            <div className="flex">
+        <div
+          className={`rounded-xl border border-slate-200 bg-white p-6 shadow ${saving ? "pointer-events-none opacity-60" : ""}`}
+        >
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Username *
+              </label>
               <input
-                name="color"
-                value={form.color || ""}
+                name="username"
+                value={form.username}
                 onChange={handleChange}
-                className="w-full border rounded-l p-2"
+                className={inputClass}
+                required
               />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Role
+              </label>
+              <select
+                name="role_name"
+                value={form.role_name}
+                onChange={handleChange}
+                disabled={isSelf}
+                className={`${inputClass} disabled:cursor-not-allowed disabled:bg-slate-50`}
+              >
+                <option value="">— None —</option>
+                {roles.map((x) => (
+                  <option key={x.id} value={x.name}>
+                    {x.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Email *
+              </label>
               <input
-                type="color"
-                value={form.color || ""}
-                onChange={(e) => setForm({ ...form, color: e.target.value })}
-                className="w-12 border rounded-r"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                className={inputClass}
+                required
               />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Phone
+              </label>
+              <input
+                name="phone"
+                value={form.phone || ""}
+                onChange={handleChange}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Department
+              </label>
+              <select
+                name="department_name"
+                value={form.department_name}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">— None —</option>
+                {departments.map((x) => (
+                  <option key={x.id} value={x.name}>
+                    {x.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Designation
+              </label>
+              <select
+                name="designation_name"
+                value={form.designation_name}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">— None —</option>
+                {designations.map((x) => (
+                  <option key={x.id} value={x.name}>
+                    {x.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Phone</label>
-            <input
-              name="phone"
-              value={form.phone || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-
-          {/* Status condition */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Status Condition Apply
-            </label>
-            <select
-              name="statusCondition"
-              value={form.statusCondition || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
+          <div className="mt-8">
+            <button
+              type="button"
+              disabled={saving || pageLoading}
+              className="inline-flex min-h-[42px] min-w-[8rem] items-center justify-center gap-2 rounded-xl bg-neutral-900 px-6 py-2 text-white shadow-md transition hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={handlesubmit}
             >
-              <option>No</option>
-              <option>Yes</option>
-            </select>
+              {saving ? (
+                <>
+                  <Loader size={20} className="text-white" />
+                  Saving…
+                </>
+              ) : (
+                "Save changes"
+              )}
+            </button>
           </div>
-
-          {/* Joining Date */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Joining Date
-            </label>
-            <input
-              type="date"
-              name="joiningDate"
-              value={form.joiningDate || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            />
-          </div>
-
-          {/* Parent */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Parent</label>
-            <select
-              name="parent"
-              value={form.parent || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            >
-              <option>Admin</option>
-              <option>Manager</option>
-            </select>
-          </div>
-
-          {/* Department */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Department</label>
-            <select
-              name="department"
-              value={form.department || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            >
-              <option>Sales_Manager</option>
-              <option>Marketing</option>
-            </select>
-          </div>
-
-          {/* Lead options */}
-          <div className="flex flex-col justify-center gap-2">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="allLead"
-                checked={form.allLead || ""}
-                onChange={handleChange}
-              />
-              All Lead
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="newLead"
-                checked={form.newLead || ""}
-                onChange={handleChange}
-              />
-              New Lead
-            </label>
-          </div>
-
-          {/* Designation */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Designation
-            </label>
-            <select
-              name="designation"
-              value={form.designation || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            >
-              <option>IT</option>
-              <option>HR</option>
-            </select>
-          </div>
-
-          {/* Gender */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Gender</label>
-            <select
-              name="gender"
-              value={form.gender || ""}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-            >
-              <option>Male</option>
-              <option>Female</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Button */}
-        <div className="mt-6">
-          <button
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            onClick={handlesubmit}
-          >
-            Edit User
-          </button>
         </div>
       </div>
-    </div>
+    </PageLoadingShell>
   );
 }
 
